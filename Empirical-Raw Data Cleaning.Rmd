@@ -191,6 +191,7 @@ Surv.data <- Surv.data %>%
 
 # To standardize the strings/values in demographic variables
 - This is only investigated two variables: Organizational country, Government level
+- Two participants whose affiliations belong to federal and Not Governmental were remove
 
 ```{r}
 # Standardize Organization country variable
