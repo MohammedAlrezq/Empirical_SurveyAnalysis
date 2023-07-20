@@ -265,7 +265,7 @@ ggsave(filename = here("plot_folder", "NAs_per_participant.png"), plot = NAs_per
 
 
 #  Participant with less than or equal 32 missing items 
-- This is to keep all participants with less than or equal 32 missing questions  
+- This chunk is to keep all participants with less than or equal 32 missing questions  
 ```{r}
 # This code is to keep participant with less than 10 missing responses   
 factor_data <- factor_data %>% 
@@ -274,3 +274,17 @@ factor_data <- factor_data %>%
 factor_data <- factor_data %>% 
   select(-total_na)
 ```
+
+# Total NAs per variable 
+- This chunk is to calculate the percentage of missing per variabels. Literature recommended to impute a vraibel with 15% missing 
+```{r}
+library(naniar)# to find NAs per variable 
+
+NAs_per_variable <- gg_miss_var(factor_data, show_pct = TRUE)+
+  theme(plot.background = element_rect(fill = "white"))
+  plotTheme()
+
+# save the plot 
+ggsave(filename = here("plot_folder", "NAs_per_variable.png"), plot = NAs_per_variable, width =8, height = 6, dpi = 300)
+```
+
