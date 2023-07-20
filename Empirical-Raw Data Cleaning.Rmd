@@ -288,3 +288,8 @@ NAs_per_variable <- gg_miss_var(factor_data, show_pct = TRUE)+
 ggsave(filename = here("plot_folder", "NAs_per_variable.png"), plot = NAs_per_variable, width =8, height = 6, dpi = 300)
 ```
 
+
+```{r}
+summary(factor_data)
+```
+
