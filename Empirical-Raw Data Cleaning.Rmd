@@ -86,7 +86,7 @@ Surv.data <-  Surv.data %>%
          BUDG_COMP = X3..LP.LSS.was.completed.within.the.estimated.budget., 
          ORG_PERF_IMP = X4..Organizational.performance.improved.after.implementing.LP.LSS., 
          EMPL_SKL_IMP = X5..Employees.knowledge..skills.and.abilities.improved.after.LP.LSS.implementation.,
-         LSS_DEPLOY = X6..LP.LSS.was.deployed.throughout.the.organization.,
+         DEPLOY = X6..LP.LSS.was.deployed.throughout.the.organization.,
          ACT_INTG = X7..LP.LSS.activities.were.integrated.into.routine.business.practices.and.procedures., 
          BUSI_IMP = X8..Business.and.supporting.activities.were.improved.after.LP.LSS.implementation.,
          TASK_COMP = X9..The.allocated.tasks.with.LP.LSS.were.completed.within.the.estimated.time.of.completion.,
@@ -110,11 +110,11 @@ Surv.data <- Surv.data %>%
          DAT_QLT = X11..Data.quality..Accuracy..validity..and.reliability.of.the.data.used.by.the.organization.to.support.LP.LSS..There.was.accurate..valid..and.reliable.data.used.by.the.organization.to.support.LP.LSS.,
          EMP_ENG = X12..Employee.engagement...Extent.to.which.employees.from.areas.targeted.are.involved.and.engaged.in.LP.LSS..Employees.from.areas.targeted.were.involved.and.engaged.in.LP.LSS.,
          TOOL_AP = X13..Tool.appropriateness..Extent.to.which.the.LP.LSS.tools.and.techniques.used.for.analysis.and.problem.solving.are.appropriate..LP.LSS.tools.and.techniques.used.for.analysis.and.problem.solving.were.appropriate.,
-         LSS_CUS = X14..Contextualization.customization.of.LP.LSS..Extent.to.which.LP.LSS.tools.and.techniques.are.customized.and.adapted.to.fit.and.align.with.the.organizational.context..LP.LSS.tools.and.techniques.were.customized.and.adapted.to.fit.and.align.with.the.organizational.context.,
-         LSS_EFT = X15..Effort.required.for.LP.LSS..Extent.to.which.the.amount.of.time.and.effort.devoted.to.LP.LSS.development.and.implementation.is.appropriate.and.feasible.The.amount.of.time.and.effort.devoted.to.LP.LSS.development.and.implementation.was.appropriate.and.feasible.,
-         LSS_SCP = X16..Scope.of.LP.LSS..Extent.to.which.the.scope.of.LP.LSS.development.and.implementation.within.the.organization.is.appropriate.and.feasible..The.scope.of.LP.LSS.development.and.implementation.within.the.organization.was.appropriate.and.feasible.,
-         LSS_INS = X17..LP.LSS.institutionalization..Extent.to.which.LP.LSS.is.deployed.throughout.the.organization..including.various.organizational.levels.and.units..LP.LSS.was.deployed.throughout.the.organization..including.various.organizational.levels.and.units.,
-         LSS_TRA = X18..LP.LSS.training.and.education..Investing.in.and.providing.the.education.training.required.to.develop.the.workforce.knowledge.skills.needed.to.support.LP.LSS..The.organization.invested.in.providing.training.education.needed.to.develop.the.knowledge.skills.needed.to.support.LP.LSS.,
+         CONTX_CUS = X14..Contextualization.customization.of.LP.LSS..Extent.to.which.LP.LSS.tools.and.techniques.are.customized.and.adapted.to.fit.and.align.with.the.organizational.context..LP.LSS.tools.and.techniques.were.customized.and.adapted.to.fit.and.align.with.the.organizational.context.,
+         EFT_REQ = X15..Effort.required.for.LP.LSS..Extent.to.which.the.amount.of.time.and.effort.devoted.to.LP.LSS.development.and.implementation.is.appropriate.and.feasible.The.amount.of.time.and.effort.devoted.to.LP.LSS.development.and.implementation.was.appropriate.and.feasible.,
+         SCOPE = X16..Scope.of.LP.LSS..Extent.to.which.the.scope.of.LP.LSS.development.and.implementation.within.the.organization.is.appropriate.and.feasible..The.scope.of.LP.LSS.development.and.implementation.within.the.organization.was.appropriate.and.feasible.,
+         INSTIT = X17..LP.LSS.institutionalization..Extent.to.which.LP.LSS.is.deployed.throughout.the.organization..including.various.organizational.levels.and.units..LP.LSS.was.deployed.throughout.the.organization..including.various.organizational.levels.and.units.,
+         TRA_EDUC = X18..LP.LSS.training.and.education..Investing.in.and.providing.the.education.training.required.to.develop.the.workforce.knowledge.skills.needed.to.support.LP.LSS..The.organization.invested.in.providing.training.education.needed.to.develop.the.knowledge.skills.needed.to.support.LP.LSS.,
          WKF_SKL = X19..Workforce.knowledge.and.skills..Extent.to.which.people.in.the.organization.had.adequate.knowledge..skills..and.competencies.to.support.LP.LSS..People.in.the.organization.had.adequate.knowledge..skills..and.competencies.to.support.LP.LSS.,
          EXP_CON = X20..Experienced.consultant..Availability.of.an.experienced.professional..within.or.from.outside.the.organization..with.sufficient.knowledge.of.LP.LSS.to.support.facilitation..coaching..and.implementation..An.experienced.professional.with.sufficient.knowledge.of.LP.LSS.was.available.to.support.facilitation..coaching..and.implementation., 
          EXT_CON = X21..External.consultant.knowledge.of.local.government.organization.processes..Extent.to.which.any.external.consultant.used.is.familiar.with.processes.and.context.of.local.government.organizations.to.translate.and.adapt.concepts.and.tools.techniques..Any.external.consultant.used.was.familiar.with.processes.and.context.of.local.government.organizations.to.translate.and.adapt.concepts.and.tools.techniques.of.LP.LSS.,
@@ -227,3 +227,49 @@ Surv.data <- Surv.data %>%
              c("Federal", "Not Governmental")))
 ```
 
+# Extract Dependnt and Independent variabels only
+```{r}
+names(Surv.data)
+
+factor_data <- Surv.data %>% 
+  select(1, 7:48)
+sum(is.na(factor_data))
+
+
+#Total NAs per participant for dependent and independent variables  
+names(factor_data)
+factor_data <- factor_data %>% 
+  mutate(total_na = rowSums(is.na(factor_data)))
+
+NAs_per_part <- factor_data %>%
+  ggplot(aes(x = total_na)) +
+  geom_bar(fill = "maroon") +
+  #theme_minimal() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.8)+
+  scale_x_continuous(breaks = seq(min(factor_data$total_na, na.rm = TRUE), 
+                                  max(factor_data$total_na, na.rm = TRUE), 
+                                  by = 2)) +
+  labs(x = "Total Missing Responses", 
+       y = "Participant", 
+       title = "Missing Responses per Participant")+
+  ylim(0, 100)+
+  plotTheme()
+NAs_per_part
+
+# Save plot in the plot folder
+library(here)# use to direct saving the plot in "plot_folder"
+
+ggsave(filename = here("plot_folder", "NAs_per_participant.png"), plot = NAs_per_part)
+```
+
+
+#  Participant with less than or equal 32 missing items 
+- This is to keep all participants with less than or equal 32 missing questions  
+```{r}
+# This code is to keep participant with less than 10 missing responses   
+factor_data <- factor_data %>% 
+  filter(total_na <= 32)
+# remove the new column for total NAs per participant
+factor_data <- factor_data %>% 
+  select(-total_na)
+```
