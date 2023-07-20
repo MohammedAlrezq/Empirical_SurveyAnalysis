@@ -1,0 +1,229 @@
+---
+title: "Survey-raw data cleaning"
+author: "Mohammed Alrezq"
+date: "2023-07-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+##Visulize the resposne category:
+
+```{r}
+# this code use only for visualization purposes
+plotTheme <- function() {
+  theme(
+    plot.title = element_text(size = 14, family = "sans", face = "plain", hjust = 0),
+    plot.subtitle=element_text(size = 11, family = "sans", hjust = 0),
+    plot.caption=element_text(size = 10, family = "sans", face = "italic", hjust = 0), 
+    axis.title.x = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = -0.5),
+    axis.title.y = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = 1),
+    axis.text = element_text(size = 9, family = "sans", face = "plain"),
+    panel.background = element_blank(),
+    panel.grid.minor = element_line(colour = "gray"),
+    panel.grid.major = element_line(colour = "gray"),
+    axis.ticks = element_blank(),
+    legend.title = element_text(size = 10, family = "sans"),
+    legend.text = element_text(size = 9, family = "sans"),
+    axis.line = element_blank()
+  )
+}
+
+```
+
+# Upload the data 
+```{r}
+Surv.data <- read.csv("SurveyReport-10640347-07-12-2023-T114540.034.csv")
+
+```
+
+# Remove unnecessary columns from the raw dataset/survey
+
+```{r}
+Surv.data <-  Surv.data %>% 
+  select(#-IP.Address, # keep IP to check on participant who might participate twice from same device 
+         -Duplicate,
+         -Time.Taken.to.Complete..Seconds.,
+         -Seq..Number,
+         -External.Reference,
+         -Custom.Variable.1,
+         -Custom.Variable.2,
+         -Custom.Variable.3,
+         -Custom.Variable.4,
+         -Custom.Variable.5,
+         -Respondent.Email,
+         -Email.List,
+         -An.Empirical.Investigation.of.Lean.Production.and.Lean.Six.Sigma.Success.in.Local.Government.OrganizationsYou.have.been.invited.to.participate.in.this.survey.because.of.your.experience.or.expertise.with.Lean.Production..LP..or.Lean.Six.Sigma..LSS..in.Local.Government.Organizations..LGOs...In.this.survey.study..LP.and.LSS.are.the.improvement.methodologies.of.interest..thus..for.simplicity..the.abbreviation..LP.LSS..is.used..The.purpose.of.this.study.is.to.determine.the.critical.success.factors..CSFs..that.are.most.strongly.related.to.LP.LSS.success.in.LGO.settings..Before.proceeding.with.the.survey..please.review.the.following.information.Definition.of.Key.TermsLean.Production..LP..an.improvement.methodology.that.follows.a.set.of.principles..or.philosophy..and.uses.tools.techniques..e.g...value.stream.mapping..5S..5Whys..kaizen.events..etc...for.maximizing.customer.value.and.minimizing.waste.Lean.Six.Sigma..LSS..a.combination.of.practices.and.tools.from.LP.and.Six.Sigma.for.better.maximizing.benefits.and.better.achieving.desired.goals..Critical.Success.Factors..CSFs...barriers..enablers..obstacles..or.any.factors.that.may.influence.LP.LSS.success.and.performance.outcomes....Who.should.complete.the.survey.We.only.need.one.person.from.each.participating.organization..or.sub.unit.within.the.organization..to.complete.the.survey..We.also.encourage.you.to.share.this.survey.invitation.with.individuals.involved.in.developing.and.or.implementing.LP.LSS.in.other.parts.of.your.organization.if.it.was.managed.as.a.separate.initiative..Survey.respondents.must.meet.the.criteria.below.Be.at.least.18.years.old.and.a.native.or.fluent.English.speaker..andHave.experience.related.to.the.development.and.or.implementation.of.LP.LSS.within.an.LGOServed.as.a.manager..team.leader.facilitator..team.member.or.consultant.related.to.a.LP.LSS.initiative.within.the.organization..If.you.do.not.meet.these.above.criteria..please.exit.the.survey.now..Which.LP.LSS.initiative.should.I.consider.in.answering.the.survey.questions.If.you.have.supervised..led.facilitated..or.collaborated.in.more.than.one.initiative.that.has.been.completed..please.consider.only.the.most.recently.completed.LP.LSS.initiative.that.was.developed.and.or.implemented.when.you.answer.the.survey.questions.,
+         -Information.Sheet.for.Participation.in.a.Research.Study.Principal.Investigator..Eileen.Van.Aken..Ph.D.Co.investigator..Mohammed.AlrezqIRB...22.875Title.of.Study..An.Empirical.Investigation.of.Lean.Production.and.Lean.Six.Sigma.Success.in.Local.Government.Organizations.You.are.invited.to.participate.in.a.survey..This.form.includes.information.about.the.survey.and.contact.information.if.you.have.any.questions..I.am.a.PhD.student.in.Industrial.and.Systems.Engineering.at.Virginia.Tech..and.I.am.conducting.this.research.as.a.part.of.my.dissertation.work.WHAT.SHOULD.I.KNOW.If.you.decide.to.participate.in.this.survey.study..you.will.complete.four.main.sections.in.this.survey..The.first.section.includes.questions.related.to.the.success.outcomes.of.developing.and.or.implementing.LP.LSS..i.e...the.experienced.outcomes.once.LP.LSS.is.completed...The.second.section.is.related.to.the.Critical.Success.Factors..CSFs..in.which.each.factor.will.be.assessed.based.on.its.impact.on.LP.LSS.success..The.third.section.includes.background.questions.related.to.the.organization.in.which.LP.LSS.was.developed.and.or.implemented..participants.experiences..and.LP.LSS.tools.techniques.used..The.fourth.section.includes.suggestions.from.the.survey.participants.for.other.potential.participants.who.might.be.willing.to.fill.out.this.survey..We.do.not.anticipate.any.risks.from.completing.this.survey..You.can.choose.whether.to.be.in.this.survey.study.or.not...If.you.volunteer.to.be.in.this.survey.study..you.may.withdraw.at.any.time.without.consequences.of.any.kind...You.may.also.refuse.to.answer.any.questions.you.don.t.want.to.answer.and.remain.in.the.study..The.investigator.may.withdraw.you.from.this.research.if.circumstances.arise.which.warrant.doing.so..CONFIDENTIALITYWe.will.do.our.best.to.protect.the.confidentiality.of.the.information.we.gather.from.you..but.we.cannot.guarantee.100..confidentiality..Any.data.collected.during.this.survey.study.will.be.kept.confidential.by.the.researchers..Any.identifiers.obtained.will.be.kept.strictly.confidential.and.not.included.in.any.publication.work.as.a.result.of.the.research.study..The.obtained.data.will.be.downloaded.and.stored.on.a.secured.and.password.protected.Google.Drive.which.is.administered.and.managed.by.Virginia.Tech..Any.identifiers.will.be.separated.from.the.data.and.then.be.coded..The.survey.results.will.be.stored.for.three.years.after.the.study.has.been.completed.and.then.destroyed..WHO.CAN.I.TALK.TO.If.you.have.any.questions.or.concerns.about.this.survey.study..please.feel.free.to.contact.the.co.investigator.at.Alrezq.vt.edu.or.443.214.6729...You.are.not.waiving.any.legal.claims..rights.or.remedies.because.of.your.participation.in.this.research.study...If.you.have.questions.regarding.your.rights.as.a.research.participant..contact.the.Virginia.Tech.HRPP.Office.at.540.231.3732..irb.vt.edu...If.you.would.like.to.participate.in.this.survey..click..Begin.the.survey..to.begin.or..No.thanks..to.exit.,
+         -Section.1..LP.LSS.outcomesIn.this.section..we.are.interested.in.your.perception.about.the.primary.goal.s..of.LP.LSS.project.initiative..that.is..the.outcomes.experienced.once.the.implementation.process.was.complete..Please.use.the.most.recently.completed.LP.LSS.project.initiative.to.respond.to.these.questions.,
+         -Section.2..Critical.Success.Factors.related.to.LP.LSS.success..In.this.section..we.are.interested.in.your.experiences.during.and.immediately.following.the.development.and.or.implementation.process.of.LP.LSS..Based.on.your.most.recent.experience.with.LP.LSS..please.indicate.the.extent.to.which.each.of.the.following.statements.regarding.critical.success.factors..CSFs..were.true.in.your.organization..CSFs.refer.to.all.barriers..enablers..obstacles..or.any.factors.that.influence.LP.LSS.success.and.performance.outcomes..Please.refer.to.the.most.recently.completed.LP.LSS.project.initiative.if.you.have.been.involved.in.more.than.one.initiative..,
+         -Section.3..Participants.Experience.and.Background..The.purpose.of.this.section.is.to.learn.about.the.organization.in.which.LP.LSS.was.developed.and.or.implemented.and.your.experience.with.LP.LSS..Please.keep.in.mind.your.most.recent.experience.with.LP.LSS.project.initiative.if.you.were.involved.with.more.than.one.initiative.,
+         -X8..Which.of.the.following.LP.LSS.improvement.tools.were.used.during.the.LP.LSS.project.initiative...Please.check.all.that.apply.,
+         -X.Section.4If.you.know.someone..i.e...academic.researchers.or.practitioners..that.might.be.interested.in.participating.in.this.study..please.complete.the.following.,
+         -Name,
+         -Email.Address)
+# These columns come with the survey data once downloaded. 
+```
+
+##Data Wrangling
+
+## Variables renaming
+
+The following is to rename the dependent and independent variables
+
+```{r}
+# Rename the Dependent variables with the acronyms 
+Surv.data <-  Surv.data %>% 
+  rename(IMPL_SUCC = X1..The.implementation.of.LP.LSS.was.successful.,
+         CULT_INTG = X2..Using.LP.LSS.became.an.important.part.of.the.culture.in.the.organization.,
+         BUDG_COMP = X3..LP.LSS.was.completed.within.the.estimated.budget., 
+         ORG_PERF_IMP = X4..Organizational.performance.improved.after.implementing.LP.LSS., 
+         EMPL_SKL_IMP = X5..Employees.knowledge..skills.and.abilities.improved.after.LP.LSS.implementation.,
+         LSS_DEPLOY = X6..LP.LSS.was.deployed.throughout.the.organization.,
+         ACT_INTG = X7..LP.LSS.activities.were.integrated.into.routine.business.practices.and.procedures., 
+         BUSI_IMP = X8..Business.and.supporting.activities.were.improved.after.LP.LSS.implementation.,
+         TASK_COMP = X9..The.allocated.tasks.with.LP.LSS.were.completed.within.the.estimated.time.of.completion.,
+         STAKEH_ACC = X10..The.results.of.LP.LSS.were.acceptable.to.all.stakeholders.,
+         EMPL_SAT = X11..Employees.were.satisfied.with.LP.LSS.,
+         EMPL_BEL_IMP = X12..Employees.believed.that.using.LP.LSS.was.important.for.the.organization.,
+         DEC_IMP = X13..Decision.making.and.other.management.processes.improved.after.LP.LSS.implementation.)
+
+#Rename the Independent variables with the acronyms 
+Surv.data <- Surv.data %>% 
+  rename(LD_SUP = X1..Leadership.support.commitment..Extent.to.which.leaders.demonstrate.commitment.and.buy.in.for.LP.LSS..Leaders.demonstrated.commitment.and.buy.in.for.LP.LSS.,
+         ORG_CUL = X2..Organizational.culture..Extent.to.which.the.organizational.culture.is.open.and.supportive.of.LP.LSS.philosophy.and.principles..The.organizational.culture.was.open.and.supportive.of.LP.LSS.philosophy.and.principles.,
+         EMP_ATT = X3..Employee.attitude..Extent.to.which.employees.buy.in.and.accept.LP.LSS.Employees.had.buy.in.and.acceptance.for.LP.LSS.,
+         RES_AVL = X4..Resource.availability..The.amount.of.financial.and.non.financial.resources.allocated.to.support.LP.LSS..including.money..people..equipment..etc..The.right.amount.of.financial.and.non.financial.resources.was.allocated.to.support.LP.LSS..including.money..people..equipment..etc.,
+         LD_INV = X5..Leadership.involvement..Extent.to.which.leaders.are.involved.throughout.the.development.and.implementation.of.LP.LSS..Leaders.were.involved.throughout.the.development.and.implementation.of.LP.LSS.,
+         PRJ_SEL = X6..Project.identification.and.selection..Identification..prioritization..and.selection.of.specific.LP.LSS.initiatives.projects.having.the.most.benefit.to.the.organization..LP.LSS.initiatives.projects.were.identified..prioritized..and.selected.based.on.the.most.benefit.to.the.organization.,
+         DEF_MEA = X7..Defining.measures..Extent.to.which.relevant.performance.measures.that.track.and.monitor.the.progress.of.improvement.are.defined.and.implemented..Relevant.performance.measures.that.track.and.monitor.the.progress.of.improvement.were.defined.and.implemented.,
+         RES_CHG = X8..General.resistance.to.change..Extent.to.which.there.is.a.lack.of.resistance.to.changes.made.as.a.result.of.LP.LSS..There.was.a.lack.of.resistance.to.changes.made.as.a.result.of.LP.LSS.,
+         LD_STL = X9..Leadership.style..Extent.to.which.leaders..style.and.approach.are.aligned.with.LP.LSS..Leaders..style.and.approach.were.aligned.with.LP.LSS.,
+         ORG_CHR = X10..Organizational.characteristics..Extent.to.which.planning.activities.address.the.key.organizational.characteristics.for.successful.LP.LSS..such.as.size.and.the.unit.of.analysis..Planning.activities.addressed.the.key.organizational.characteristics.for.successful.LP.LSS..such.as.size.and.the.unit.of.analysis.,
+         DAT_QLT = X11..Data.quality..Accuracy..validity..and.reliability.of.the.data.used.by.the.organization.to.support.LP.LSS..There.was.accurate..valid..and.reliable.data.used.by.the.organization.to.support.LP.LSS.,
+         EMP_ENG = X12..Employee.engagement...Extent.to.which.employees.from.areas.targeted.are.involved.and.engaged.in.LP.LSS..Employees.from.areas.targeted.were.involved.and.engaged.in.LP.LSS.,
+         TOOL_AP = X13..Tool.appropriateness..Extent.to.which.the.LP.LSS.tools.and.techniques.used.for.analysis.and.problem.solving.are.appropriate..LP.LSS.tools.and.techniques.used.for.analysis.and.problem.solving.were.appropriate.,
+         LSS_CUS = X14..Contextualization.customization.of.LP.LSS..Extent.to.which.LP.LSS.tools.and.techniques.are.customized.and.adapted.to.fit.and.align.with.the.organizational.context..LP.LSS.tools.and.techniques.were.customized.and.adapted.to.fit.and.align.with.the.organizational.context.,
+         LSS_EFT = X15..Effort.required.for.LP.LSS..Extent.to.which.the.amount.of.time.and.effort.devoted.to.LP.LSS.development.and.implementation.is.appropriate.and.feasible.The.amount.of.time.and.effort.devoted.to.LP.LSS.development.and.implementation.was.appropriate.and.feasible.,
+         LSS_SCP = X16..Scope.of.LP.LSS..Extent.to.which.the.scope.of.LP.LSS.development.and.implementation.within.the.organization.is.appropriate.and.feasible..The.scope.of.LP.LSS.development.and.implementation.within.the.organization.was.appropriate.and.feasible.,
+         LSS_INS = X17..LP.LSS.institutionalization..Extent.to.which.LP.LSS.is.deployed.throughout.the.organization..including.various.organizational.levels.and.units..LP.LSS.was.deployed.throughout.the.organization..including.various.organizational.levels.and.units.,
+         LSS_TRA = X18..LP.LSS.training.and.education..Investing.in.and.providing.the.education.training.required.to.develop.the.workforce.knowledge.skills.needed.to.support.LP.LSS..The.organization.invested.in.providing.training.education.needed.to.develop.the.knowledge.skills.needed.to.support.LP.LSS.,
+         WKF_SKL = X19..Workforce.knowledge.and.skills..Extent.to.which.people.in.the.organization.had.adequate.knowledge..skills..and.competencies.to.support.LP.LSS..People.in.the.organization.had.adequate.knowledge..skills..and.competencies.to.support.LP.LSS.,
+         EXP_CON = X20..Experienced.consultant..Availability.of.an.experienced.professional..within.or.from.outside.the.organization..with.sufficient.knowledge.of.LP.LSS.to.support.facilitation..coaching..and.implementation..An.experienced.professional.with.sufficient.knowledge.of.LP.LSS.was.available.to.support.facilitation..coaching..and.implementation., 
+         EXT_CON = X21..External.consultant.knowledge.of.local.government.organization.processes..Extent.to.which.any.external.consultant.used.is.familiar.with.processes.and.context.of.local.government.organizations.to.translate.and.adapt.concepts.and.tools.techniques..Any.external.consultant.used.was.familiar.with.processes.and.context.of.local.government.organizations.to.translate.and.adapt.concepts.and.tools.techniques.of.LP.LSS.,
+         UND_CNG = X22..Understanding.the.need.for.change..Extent.to.which.a.clear.and.compelling.need.for.change.is.communicated.throughout.the.organization..A.clear.and.compelling.need.for.change.was.communicated.throughout.the.organization., 
+         COM_KNW = X23..Communicating.knowledge.and.success.stories..Extent.to.which.LP.LSS.best.practices.and.success.stories.are.shared.across.the.organization......LP.LSS.best.practices.and.success.stories.were.shared.across.the.organization.,
+         PAT_RES = X24..Patience.for.results..Extent.to.which.people.in.the.organization.have.the.necessary.patience.for.improvements.in.results.to.be.realized.People.in.the.organization.had.the.necessary.patience.for.improvements.in.results.to.be.realized.,
+         GOAL_CL = X25..Goal.clarity..Extent.to.which.the.goals.and.aims.of.LP.LSS.are.clear.and.understood.across.the.organization..The.goals.and.aims.of.LP.LSS.were.clear.and.understood.across.the.organization.,
+         CUS_IDEF= X26..Customer.identification..Extent.to.which.customers.of.processes.targeted.for.improvement.are.clearly.identified.Customers.of.processes.targeted.for.improvement.were.clearly.identified.,
+         GOAL_AL = X27..Goal.alignment..Extent.to.which.LP.LSS.is.aligned.with.organizational.goals.and.priorities..LP.LSS.was.aligned.with.organizational.goals.and.priorities.,
+         SYS_COM = X28..Target.system.complexity..Extent.to.which.the.workflow..interconnections..and.interdependencies.in.processes.targeted.for.improvement.are.routine.and.not.complex..The.workflow..interconnections..and.interdependencies.in.processes.targeted.for.improvement.were.routine.and.not.complex.,
+         TEAM_ST = X29..Team.structure.and.roles..Extent.to.which.teams.used.to.develop.and.implement.LP.LSS.have.clearly.defined.roles.and.responsibilities..Teams.used.to.develop.and.implement.LP.LSS.had.clearly.defined.roles.and.responsibilities.)
+
+#Rename the demographic variables with the acronyms
+Surv.data <- Surv.data %>% 
+  rename(ORG_CTRY = X1..In.what.country.is.the.organization.located...Please.select.a.location.in.which.LP.LSS.was.developed.and.or.implemented..,
+         GOV_LVL = X2..Which.of.the.following.best.describes.the.governmental.level.of.the.organization..The.governmental.level.represents.the.territory.in.which.the.organization.controls..,
+         Other_GovLevel = Other..Please.specify.,
+         FUNC_AREA = X3..Which.of.the.following.best.describes.the.functionality.of.the.targeted.area.in.which.LP.LSS.has.been.developed.and.or.implemented..i.e...unit.of.analysis...,
+         Other_Fnction = Other..Please.specify..1,
+         POP_SIZE = X4..What.is.the.approximate.population.size..i.e...inhabitants..that.the.organization.serves..Please.provide.a.specific.number.,
+         INST_LVL = X5..Which.of.the.following.best.describes.the.institutionalization.level.of.LP.LSS..The.institutionalization.level.refers.to.whether.LP.LSS.was.developed.and.implemented.within.a.single..multiple..or.all.sub.units..i.e...department..division..etc...of.the.organization.,
+         Other_InstLvl = Other..Please.specify..2,
+         ORG_SIZE = X6..Which.of.the.following.best.describes.the.overall.size.of.the.organization.in.which.LP.LSS.has.been.developed.and.or.implemented..,
+         IMP_FOCUS = X7..Which.of.the.following.best.describes.the.main.focus.of.the.improvement.methodology.used.for.this.initiative..The.main.focus.of.the.improvement.methodology.refers.to.whether.this.project.initiative.used.only.LP.tools.techniques..a.combination.of.LP.and.Six.Sigma..known.as.Lean.Six.Sigma..LSS....or.LP.with.other.general.improvement.methodologies...,
+         Other_ManFocus = Other..Please.specify..3,
+         VSM = Value.Stream.Mapping,
+         FIVE_S = X5S,
+         Visual_Mgmt = Visual.Management,
+         Five_Whys = X5Whys, 
+         PFC= Process.Flow.Chart,
+         KEs = Kaizen.Event,
+         CEDA = Cause.and.Effect.Diagram.Analysis,
+         Mistake_Proofing = Mistake.Proofing.,
+         Project_Charter = Project.Charter,
+         Gemba = Gemba..i.e...go.and.see.,
+         Spaghetti_Diagram = Spaghetti.Diagram.,
+         SPC = Statistical.Process.Control,
+         CS_Kanban = Check.Sheet.Kanban.,
+         CTQ = Critical.to.Quality,
+         OPF = One.Piece.Flow.,
+         QFD = Quality.Function.Deployment,
+         Project_Charter_2 = Project.Charter.1,
+         Benchmarking_2 = Benchmarking.1,
+         CTA = Cycle.Time.Analysis.,
+         PD = Policy.Deployment.,
+         LTA = Lead.Time.Analysis.,
+         SMED = Single.Minute.Exchange.of.Dies,
+         Other_Tools = Other..Please.specify..4,
+         IMPL_PCT = X9..What.percentage.of.ideas.and.changes.identified.in.the.LP.LSS.initiative.have.been.implemented.,
+         EXP = X10..How.would.you.classify.your.experience.with.LP.LSS.,
+         Other_EXP = Other..Please.specify..5,
+         EXP_YRS = X11..How.many.years.of.experience.do.you.have.with.LP.LSS.implementation.,
+         ROLE_TYP = X12..Which.of.the.following.best.describes.your.role..or.roles..in.LP.LSS.development.and.or.implementation.process.,
+         Other_Role = Other..Please.specify..6,
+         COMP_AGO = X13..How.long.ago.was.this.LP.LSS.completed...Please.select.the.one.that.best.describes.how.long.ago.this.LP.LSS.was.completed.,
+         ORG_EXP = X14..How.long.has.the.organization.been.working.on.LP.LSS.project.initiative.)
+
+```
+
+
+```{r}
+library(lubridate)
+# to change Timestamp..mm.dd.yyyy. to date/time column and remove Timestamp..mm.dd.yyyy. and time. Keep only date  
+Surv.data <- Surv.data %>%
+  mutate(Date = as.Date(mdy_hm(Timestamp..mm.dd.yyyy.)), # Extract date
+         Time = format(mdy_hm(Timestamp..mm.dd.yyyy.), "%H:%M")) %>% # Extract time
+  select(-Time) %>%  # Remove Time column
+  relocate(Date, .after = 2) %>% # to bring Date column to be 3rd column
+  select(-Timestamp..mm.dd.yyyy.) %>% # to remove timestamp column
+  rename(Country_Survey = Country.Code) # to rename the country code to country 
+
+# this chunk should combine the columns that are the same such project charter, bechmarking, etc.
+```
+
+# To standardize the strings/values in demographic variables
+- This is only investigated two variables: Organizational country, Government level
+
+```{r}
+# Standardize Organization country variable
+#table(Surv.data$ORG_CTRY)
+Surv.data <- Surv.data %>%
+  mutate(ORG_CTRY = case_when(
+    ORG_CTRY %in% c("United States", "United States of America", "U.S", "US", "Ohio, USA", "The United States of America", "USA") ~ "USA",
+    ORG_CTRY %in% c("United Arab Emirates")~ "UAE",
+    ORG_CTRY %in% c("Turkiye")~ "Turkey",
+    TRUE ~ ORG_CTRY
+  ))
+
+# Re-code Government level variable
+#table(Surv.data$GOV_LVL)
+Surv.data <- Surv.data %>% 
+  mutate(GOV_LVL = recode(GOV_LVL,
+                          "1" = "State level",
+                          "2" = "City level",
+                          "3" = "County",
+                          "4" = "Village",
+                          "5" = "Town",
+                          "6" = "Other"))
+
+# To combine "other" with "GOV_LVL"
+Surv.data <- Surv.data %>%
+  mutate(GOV_LVL = if_else(Other_GovLevel == "Not Governmental", "Not Governmental", GOV_LVL)) %>% 
+  mutate(GOV_LVL = if_else(Other_GovLevel == "Federal", "Federal", GOV_LVL)) %>% 
+  select(-Other_GovLevel)
+# Explanation: In this case, if the values in the Other_GovLevel column are "Not Governmental", the corresponding values in the GOV_LVL column will also be set to "Not Governmental". If the condition is false, the GOV_LVL column remains unchanged.
+
+# To remove two participants who were from Federal gov. and Non-governemnt organizations 
+Surv.data <- Surv.data %>% 
+  filter(!(GOV_LVL %in%
+             c("Federal", "Not Governmental")))
+```
+
