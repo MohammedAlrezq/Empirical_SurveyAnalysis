@@ -246,14 +246,14 @@ NAs_per_part <- factor_data %>%
   ggplot(aes(x = total_na)) +
   geom_bar(fill = "maroon") +
   #theme_minimal() +
-  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.8)+
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.8) +
   scale_x_continuous(breaks = seq(min(factor_data$total_na, na.rm = TRUE), 
                                   max(factor_data$total_na, na.rm = TRUE), 
                                   by = 2)) +
   labs(x = "Total Missing Responses", 
        y = "Participant", 
        title = "Missing Responses per Participant")+
-  ylim(0, 100)+
+  ylim(0, 100) +
   plotTheme()
 NAs_per_part
 
@@ -290,6 +290,9 @@ ggsave(filename = here("plot_folder", "NAs_per_variable.png"), plot = NAs_per_va
 
 
 ```{r}
-summary(factor_data)
+install.packages("mice")
+library(mice)
+
+md.pattern(factor_data)
 ```
 
