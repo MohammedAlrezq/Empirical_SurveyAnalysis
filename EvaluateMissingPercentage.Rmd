@@ -1,0 +1,59 @@
+---
+title: "EvaluteMissingPercentage.Branch"
+author: "Mohammed Alrezq"
+date: "2023-07-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# The following is to check which sample size tp pick and has 10% missing per variable 
+```{r}
+#with missing 4 or less 
+data.CompletedCases4 <- factor_data |> 
+  filter(total_na <= 4) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases4
+CompletedCases.plot4 <- gg_miss_var(data.CompletedCases4, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "Participants with 4 missing questions")
+# with missing 6 or less 
+data.CompletedCases6 <- factor_data |> 
+  filter(total_na <= 6) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases6
+CompletedCases.plot6 <- gg_miss_var(data.CompletedCases6, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "Participants with 6 missing questions")
+# with missing 9 or less 
+data.CompletedCases9 <- factor_data |> 
+  filter(total_na <= 9) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases9
+CompletedCases.plot9 <- gg_miss_var(data.CompletedCases9, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "PParticipants with 9 missing questions")
+# with missing 10 or less 
+data.CompletedCases10 <- factor_data |> 
+  filter(total_na <= 10) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases10
+CompletedCases.plot10 <- gg_miss_var(data.CompletedCases10, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme()+
+  labs(title = "Participants with 10 missing questions")
+# with missing 19 or less 
+data.CompletedCases19 <- factor_data |> 
+  filter(total_na <= 19) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases19
+CompletedCases.plot19 <- gg_miss_var(data.CompletedCases19, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() +
+  labs(title = "Participants with 19 missing questions") 
+```
