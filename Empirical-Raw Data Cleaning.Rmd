@@ -2,7 +2,9 @@
 title: "Survey-raw data cleaning"
 author: "Mohammed Alrezq"
 date: "2023-07-19"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -12,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 ```
 
 ##Visulize the resposne category:
@@ -242,23 +245,21 @@ names(factor_data)
 factor_data <- factor_data %>% 
   mutate(total_na = rowSums(is.na(factor_data)))
 
-NAs_per_part <- factor_data %>%
-  ggplot(aes(x = total_na)) +
-  geom_bar(fill = "maroon") +
-  #theme_minimal() +
+NAs_per_part <- ggplot(factor_data, aes(total_na)) +
+  geom_bar(fill = "maroon") + # to fill bar color 
   geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.8) +
   scale_x_continuous(breaks = seq(min(factor_data$total_na, na.rm = TRUE), 
                                   max(factor_data$total_na, na.rm = TRUE), 
                                   by = 2)) +
   labs(x = "Total Missing Responses", 
        y = "Participant", 
-       title = "Missing Responses per Participant")+
+       title = "Missing Responses per Participant") +
   ylim(0, 100) +
   plotTheme()
 NAs_per_part
 
 # Save plot in the plot folder
-library(here)# use to direct saving the plot in "plot_folder"
+library(here)# use to direct saving the plot in "plot_folder" and fucntion "here"
 
 ggsave(filename = here("plot_folder", "NAs_per_participant.png"), plot = NAs_per_part)
 ```
@@ -271,8 +272,9 @@ ggsave(filename = here("plot_folder", "NAs_per_participant.png"), plot = NAs_per
 factor_data <- factor_data %>% 
   filter(total_na <= 32)
 # remove the new column for total NAs per participant
-factor_data <- factor_data %>% 
-  select(-total_na)
+# factor_data <- factor_data %>% 
+#   select(-total_na)
+
 ```
 
 # Total NAs per variable 
@@ -280,17 +282,46 @@ factor_data <- factor_data %>%
 ```{r}
 library(naniar)# to find NAs per variable 
 
-NAs_per_variable <- gg_miss_var(factor_data, show_pct = TRUE)+
+NAs_per_variable <- gg_miss_var(factor_data, show_pct = TRUE) +
   theme(plot.background = element_rect(fill = "white"))
   plotTheme()
+NAs_per_variable
 
 # save the plot 
-ggsave(filename = here("plot_folder", "NAs_per_variable.png"), plot = NAs_per_variable, width =8, height = 6, dpi = 300)
+ggsave(filename = here("plot_folder", "NAs_per_variable.png"), plot = NAs_per_variable, width = 8, height = 6, dpi = 300)
 ```
 
+# Data Imputation 
+- This imputation section is divided into two subsections: imputation with subset of the data **(63 participants with 5% missing)** and imputation with the full dataset **(73 participants with 17% missing)**
+
+## Imputation with subset/completed cases of the data (63 participants)
+- this following chunks will includes only participants who had 1 missing questions. This is considered because it is recommended that a total of *missing questions* should *not exceed 5% per variable *
+```{r}
+# Select 63 participants
+data.CompletedCases <- factor_data |> 
+  filter(total_na <= 1) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases with 63 participants
+CompletedCases.plot <- gg_miss_var(data.CompletedCases, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme()
+# save the plot 
+ggsave(filename = here("plot_folder", "CompletedCases.plot.png"), plot = CompletedCases.plot)
+
+summary(data.CompletedCases)
+# Imputation using the mean 
+mean_imput.data <- data.CompletedCases |> 
+  mutate_all(function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
+summary(mean_imput.data)
+
+#write.csv(mean_imput.data, "mean_data.csv")
+```
+
+## Imputation with Full dataset (total of 73 participants)
+- The following includes different chunks that used different methodologies to find best imputation techniques
 
 ```{r}
-install.packages("mice")
+#install.packages("mice")
 library(mice)
 
 md.pattern(factor_data)
