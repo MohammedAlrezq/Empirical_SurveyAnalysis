@@ -1,0 +1,16 @@
+---
+title: "EFA Model"
+author: "Mohammed Alrezq"
+date: "2023-07-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Upload imputed data based on the mean 
+```{r}
+mean_data <- read.csv("mean_data.csv")
+```
+
