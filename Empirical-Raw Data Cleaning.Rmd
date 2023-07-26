@@ -233,15 +233,14 @@ Surv.data <- Surv.data %>%
 
 # Extract Dependnt and Independent variabels only
 ```{r}
-names(Surv.data)
-
+#names(Surv.data)
 factor_data <- Surv.data %>% 
   select(1, 7:48)
 sum(is.na(factor_data))
 
 
 #Total NAs per participant for dependent and independent variables  
-names(factor_data)
+#names(factor_data)
 factor_data <- factor_data %>% 
   mutate(total_na = rowSums(is.na(factor_data)))
 
@@ -316,6 +315,79 @@ summary(mean_imput.data)
 
 #write.csv(mean_imput.data, "mean_data.csv")
 ```
+
+
+```{r}
+#with missing 4 or less 
+data.CompletedCases4 <- factor_data |> 
+  filter(total_na <= 4) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases with 63 participants
+CompletedCases.plot4 <- gg_miss_var(data.CompletedCases4, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "Participants with 4 missing questions")
+
+# with missing 6 or less 
+data.CompletedCases6 <- factor_data |> 
+  filter(total_na <= 6) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases with 63 participants
+CompletedCases.plot6 <- gg_miss_var(data.CompletedCases6, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "Participants with 6 missing questions")
+
+# with missing 9 or less 
+data.CompletedCases9 <- factor_data |> 
+  filter(total_na <= 9) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases with 63 participants
+CompletedCases.plot9 <- gg_miss_var(data.CompletedCases9, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "PParticipants with 9 missing questions")
+
+# with missing 10 or less 
+data.CompletedCases10 <- factor_data |> 
+  filter(total_na <= 10) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases with 63 participants
+CompletedCases.plot10 <- gg_miss_var(data.CompletedCases10, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme()+
+  labs(title = "Participants with 10 missing questions")
+
+# with missing 19 or less 
+data.CompletedCases19 <- factor_data |> 
+  filter(total_na <= 19) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases with 63 participants
+CompletedCases.plot19 <- gg_miss_var(data.CompletedCases19, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() +
+  labs(title = "Participants with 19 missing questions") 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Imputation with Full dataset (total of 73 participants)
 - The following includes different chunks that used different methodologies to find best imputation techniques
