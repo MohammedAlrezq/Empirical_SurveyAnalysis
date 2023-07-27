@@ -298,16 +298,18 @@ ggsave(filename = here("plot_folder", "NAs_per_variable.png"), plot = NAs_per_va
 ```{r}
 # Select 63 participants
 data.CompletedCases <- factor_data |> 
-  filter(total_na <= 1) |> 
+  filter(total_na <= 10) |> 
   select(-total_na)
 # Plot variables for missing% from the data.CompletedCases with 63 participants
 CompletedCases.plot <- gg_miss_var(data.CompletedCases, show_pct = TRUE) +
   theme(plot.background = element_rect(fill = "white")) +
-  plotTheme()
+  labs(title = "Data Size = 67 participants") +
+  plotTheme() 
 # save the plot 
 ggsave(filename = here("plot_folder", "CompletedCases.plot.png"), plot = CompletedCases.plot)
 
 summary(data.CompletedCases)
+
 # Imputation using the mean 
 mean_imput.data <- data.CompletedCases |> 
   mutate_all(function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
@@ -318,57 +320,12 @@ summary(mean_imput.data)
 
 
 ```{r}
-#with missing 4 or less 
-data.CompletedCases4 <- factor_data |> 
-  filter(total_na <= 4) |> 
-  select(-total_na)
-# Plot variables for missing% from the data.CompletedCases with 63 participants
-CompletedCases.plot4 <- gg_miss_var(data.CompletedCases4, show_pct = TRUE) +
-  theme(plot.background = element_rect(fill = "white")) +
-  plotTheme() + 
-  labs(title = "Participants with 4 missing questions")
 
-# with missing 6 or less 
-data.CompletedCases6 <- factor_data |> 
-  filter(total_na <= 6) |> 
-  select(-total_na)
-# Plot variables for missing% from the data.CompletedCases with 63 participants
-CompletedCases.plot6 <- gg_miss_var(data.CompletedCases6, show_pct = TRUE) +
-  theme(plot.background = element_rect(fill = "white")) +
-  plotTheme() + 
-  labs(title = "Participants with 6 missing questions")
+library(renv)
+renv
 
-# with missing 9 or less 
-data.CompletedCases9 <- factor_data |> 
-  filter(total_na <= 9) |> 
-  select(-total_na)
-# Plot variables for missing% from the data.CompletedCases with 63 participants
-CompletedCases.plot9 <- gg_miss_var(data.CompletedCases9, show_pct = TRUE) +
-  theme(plot.background = element_rect(fill = "white")) +
-  plotTheme() + 
-  labs(title = "PParticipants with 9 missing questions")
 
-# with missing 10 or less 
-data.CompletedCases10 <- factor_data |> 
-  filter(total_na <= 10) |> 
-  select(-total_na)
-# Plot variables for missing% from the data.CompletedCases with 63 participants
-CompletedCases.plot10 <- gg_miss_var(data.CompletedCases10, show_pct = TRUE) +
-  theme(plot.background = element_rect(fill = "white")) +
-  plotTheme()+
-  labs(title = "Participants with 10 missing questions")
-
-# with missing 19 or less 
-data.CompletedCases19 <- factor_data |> 
-  filter(total_na <= 19) |> 
-  select(-total_na)
-# Plot variables for missing% from the data.CompletedCases with 63 participants
-CompletedCases.plot19 <- gg_miss_var(data.CompletedCases19, show_pct = TRUE) +
-  theme(plot.background = element_rect(fill = "white")) +
-  plotTheme() +
-  labs(title = "Participants with 19 missing questions") 
 ```
-
 
 
 
