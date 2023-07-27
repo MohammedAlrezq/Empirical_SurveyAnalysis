@@ -320,9 +320,17 @@ summary(mean_imput.data)
 
 
 ```{r}
+install.packages("DataExplorer")
+library(DataExplorer)
+plot_missing(data.CompletedCases, 
+             group = list(OK = 0.1, Bad = 0.11),
+             missing_only = TRUE)+
+  plotTheme()
 
-library(renv)
-renv
+
+plot_missing(factor_data, 
+             missing_only = TRUE)+
+  plotTheme()
 
 
 ```
@@ -353,6 +361,6 @@ renv
 #install.packages("mice")
 library(mice)
 
-md.pattern(factor_data)
+#md.pattern(factor_data)
 ```
 
