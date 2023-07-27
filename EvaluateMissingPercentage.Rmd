@@ -57,3 +57,20 @@ CompletedCases.plot19 <- gg_miss_var(data.CompletedCases19, show_pct = TRUE) +
   plotTheme() +
   labs(title = "Participants with 19 missing questions") 
 ```
+
+# The following package can be used to visulize missing data 
+- Package name: DataExplorer 
+```{r}
+install.packages("DataExplorer")
+library(DataExplorer)
+plot_missing(data.CompletedCases, 
+             group = list(OK = 0.1, Bad = 0.11),
+             missing_only = TRUE)+
+  plotTheme()
+
+
+plot_missing(factor_data, 
+             missing_only = TRUE)+
+  plotTheme()
+```
+
