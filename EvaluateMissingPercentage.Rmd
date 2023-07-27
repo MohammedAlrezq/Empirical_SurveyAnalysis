@@ -74,3 +74,11 @@ plot_missing(factor_data,
   plotTheme()
 ```
 
+# Imputation using MICE package 
+```{r}
+install.packages("VIM")# this package is to plot the pattern in missing dataset 
+library(VIM)
+
+
+```
+
