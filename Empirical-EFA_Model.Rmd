@@ -9,8 +9,17 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(tidyverse)
+```
+
+
 # Upload imputed data based on the mean 
 ```{r}
-mean_data <- read.csv("mean_data.csv")
+data <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X
+data <- data |> 
+  select(c(-Response.ID, -X))
 ```
 
