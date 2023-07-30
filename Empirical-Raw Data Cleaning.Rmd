@@ -340,7 +340,7 @@ summary(mean_imput.data)
 
 
 
-## Imputation with Full dataset (total of 73 participants)
+## Imputation with Full dataset (total of 73 participants):
 - The following includes different chunks that used different methodologies to find best imputation techniques
 
 ```{r}
