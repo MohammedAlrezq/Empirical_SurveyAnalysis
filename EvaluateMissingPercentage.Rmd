@@ -1,0 +1,174 @@
+---
+title: "EvaluteMissingPercentage.Branch"
+author: "Mohammed Alrezq"
+date: "2023-07-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# The following is to check which sample size tp pick and has 10% missing per variable 
+```{r}
+#with missing 4 or less 
+data.CompletedCases4 <- factor_data |> 
+  filter(total_na <= 4) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases4
+CompletedCases.plot4 <- gg_miss_var(data.CompletedCases4, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "Participants with 4 missing questions")
+# with missing 6 or less 
+data.CompletedCases6 <- factor_data |> 
+  filter(total_na <= 6) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases6
+CompletedCases.plot6 <- gg_miss_var(data.CompletedCases6, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "Participants with 6 missing questions")
+# with missing 9 or less 
+data.CompletedCases9 <- factor_data |> 
+  filter(total_na <= 9) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases9
+CompletedCases.plot9 <- gg_miss_var(data.CompletedCases9, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() + 
+  labs(title = "PParticipants with 9 missing questions")
+# with missing 10 or less 
+data.CompletedCases10 <- factor_data |> 
+  filter(total_na <= 10) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases10
+CompletedCases.plot10 <- gg_miss_var(data.CompletedCases10, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme()+
+  labs(title = "Participants with 10 missing questions")
+# with missing 19 or less 
+data.CompletedCases19 <- factor_data |> 
+  filter(total_na <= 19) |> 
+  select(-total_na)
+# Plot variables for missing% from the data.CompletedCases19
+CompletedCases.plot19 <- gg_miss_var(data.CompletedCases19, show_pct = TRUE) +
+  theme(plot.background = element_rect(fill = "white")) +
+  plotTheme() +
+  labs(title = "Participants with 19 missing questions") 
+```
+
+# Imputation using MICE Package 
+
+## Plot using md.pattern to check the pattern of missingness  
+```{r}
+install.packages("VIM")# this package is to plot the pattern in missing dataset 
+library(VIM)
+install.packages("MICE")
+library(mice)
+
+# delete response ID and total_na columns 
+factor_data_MICE <- factor_data |> 
+  select(c(-Response.ID, -total_na))
+
+# missing per variabels 
+md.pattern(factor_data_MICE, rotate.names = TRUE)
+
+
+
+```
+
+## The following package can also be used to visulize missing data 
+- Package name: DataExplorer 
+```{r}
+#install.packages("DataExplorer")
+library(DataExplorer)
+plot_missing(factor_data_MICE, 
+             missing_only = TRUE) +
+  plotTheme()
+
+```
+
+## Imputation using single methdo: mean
+```{r}
+# The good things about MICE imputtion using mean is that it imputes same value from exisitng data, meaning that plusable vlaues are ordinal not decimal 
+imputation.1 <- mice(factor_data_MICE,
+                     method = "mean", # Replace by mean of the other values 
+                     m = 1, # No. of multiple imputation 
+                     maxit = 1) # max. iteration. it is good for convergence 
+
+
+# to check/see imputed values for each missing cell in each variable
+imputation.1$imp
+
+# To see the completed dataset after imputation 
+complete(imputation.1, action = 1) # action is the first dataset, and it is only 1 dataset as we have one # iteration
+
+
+
+density(imputation.1)
+
+str(imputation.1)
+
+
+library(VIM)
+aggr_plot <- aggr(factor_data_MICE, 
+                  col=c('lightblue','lightgreen'), 
+                  numbers=TRUE, 
+                  sortVars=TRUE, 
+                  labels=names(factor_data_MICE), 
+                  cex.axis=.3, 
+                  gap=3, 
+                  ylab=c("Histogram of missing data","Pattern"))+
+  plotTheme()
+
+A <- aggr(factor_data_MICE, plot = FALSE)
+plot(A, numbers = TRUE, prop = FALSE)
+```
+
+
+# check if the data fopr missing is missing at MCAR
+- [This video explain well about MCAR](https://www.youtube.com/watch?v=h9CzBtLpt_8&ab_channel=StatswithMia)
+
+```{r}
+# install the package if you haven't already
+install.packages("naniar")
+
+# load the package
+library(naniar)
+
+# use the test_mcar function on your data
+result <- mcar_test(factor_data_MICE)
+
+# print the result
+print(result)
+# A tibble: 1 × 4
+#   statistic    df  p.value missing.patterns
+#       <dbl> <dbl>    <dbl>            <int>
+# 1      548.   349 4.51e-11               12
+# # the above results from mcar_test suggested that the missininges is not related to MCAR
+
+
+
+```
+
+## Another package to imputation using regression 
+```{r}
+install.packages("Hmisc")
+library(Hmisc)
+
+
+```
+
+
+to use kinti package for table 
+```{r}
+install.packages("knitr")
+library(knitr)
+
+summ <- summary(data)
+
+knitr::kable(summ)
+
+```
+
