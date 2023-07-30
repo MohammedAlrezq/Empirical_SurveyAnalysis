@@ -84,3 +84,9 @@ plots <- lapply(vars, plot_histogram)
 grid.arrange(grobs = plots, ncol = 4)
 ```
 
+# Factor Analysis: Factorial Axis Analysis 
+```{r}
+
+```
+
+
