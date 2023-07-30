@@ -87,15 +87,15 @@ Surv.data <-  Surv.data %>%
   rename(IMPL_SUCC = X1..The.implementation.of.LP.LSS.was.successful.,
          CULT_INTG = X2..Using.LP.LSS.became.an.important.part.of.the.culture.in.the.organization.,
          BUDG_COMP = X3..LP.LSS.was.completed.within.the.estimated.budget., 
-         ORG_PERF_IMP = X4..Organizational.performance.improved.after.implementing.LP.LSS., 
-         EMPL_SKL_IMP = X5..Employees.knowledge..skills.and.abilities.improved.after.LP.LSS.implementation.,
+         ORG_IMP = X4..Organizational.performance.improved.after.implementing.LP.LSS., 
+         EMPL_SKI = X5..Employees.knowledge..skills.and.abilities.improved.after.LP.LSS.implementation.,
          DEPLOY = X6..LP.LSS.was.deployed.throughout.the.organization.,
          ACT_INTG = X7..LP.LSS.activities.were.integrated.into.routine.business.practices.and.procedures., 
          BUSI_IMP = X8..Business.and.supporting.activities.were.improved.after.LP.LSS.implementation.,
          TASK_COMP = X9..The.allocated.tasks.with.LP.LSS.were.completed.within.the.estimated.time.of.completion.,
          STAKEH_ACC = X10..The.results.of.LP.LSS.were.acceptable.to.all.stakeholders.,
          EMPL_SAT = X11..Employees.were.satisfied.with.LP.LSS.,
-         EMPL_BEL_IMP = X12..Employees.believed.that.using.LP.LSS.was.important.for.the.organization.,
+         EMPL_BEL = X12..Employees.believed.that.using.LP.LSS.was.important.for.the.organization.,
          DEC_IMP = X13..Decision.making.and.other.management.processes.improved.after.LP.LSS.implementation.)
 
 #Rename the Independent variables with the acronyms 
@@ -231,7 +231,7 @@ Surv.data <- Surv.data %>%
              c("Federal", "Not Governmental")))
 ```
 
-# Extract Dependnt and Independent variabels only
+# Plot missing per participant
 ```{r}
 #names(Surv.data)
 factor_data <- Surv.data %>% 
