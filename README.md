@@ -26,14 +26,14 @@ The following tables show the acronyms used for each item/variabel
 |2                          |Using LP/LSS became an important part of the culture in the organization|*CULT_INTG*|
 |3                          |LP/LSS was completed within the estimated budget|*BUDG_COMP*|
 |4                          |Organizational performance improved after implementing LP/LSS|*ORG_IMP*|
-|5                          |Employees knowledge, skills and abilities improved after LP/LSS implementation|*EMPL_IMP*|
+|5                          |Employees knowledge, skills and abilities improved after LP/LSS implementation|*EMPL_SKI*|
 |6                          |LP/LSS was deployed throughout the organization|*DEPLOY*|
 |7                          |LP/LSS activities were integrated into routine business practices and procedures|*ACT_INTG*|
 |8                          |Business and supporting activities were improved after LP/LSS implementation|*BUSI_IMP*|
 |9                          |The allocated tasks with LP/LSS were completed within the estimated time of completion|*TASK_COMP*|
 |10                         |The results of LP/LSS were acceptable to all stakeholders|*STAKEH_ACC*|
 |11                         |Employees were satisfied with LP/LSS|*EMPL_SAT*|
-|12                         |Employees believed that using LP/LSS was important for the organization|*EMPL_IMP*|
+|12                         |Employees believed that using LP/LSS was important for the organization|*EMPL_BEL*|
 |13                         |Decision making and other management processes improved after LP/LSS implementation|*DEC_IMP*|
 
 ## Table 2: Independent Variables 
