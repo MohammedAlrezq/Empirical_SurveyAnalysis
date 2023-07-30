@@ -172,3 +172,99 @@ knitr::kable(summ)
 
 ```
 
+# Factor analysis Steps:
+## 1.2 Load data 
+```{r}
+data <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X from the data 
+data <- data |> 
+  select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+data <- data |> 
+  mutate_if(is.integer, as.numeric)
+str(data)
+dim(data)
+```
+
+# 2. Preliminary Steps 
+## 2.1 Descriptive statistics 
+```{r}
+describe(data)
+```
+
+## 2.2 Check normality plot 
+```{r}
+# Function to plot a histogram for a variable
+plot_histogram <- function(var) {
+  ggplot(data, aes_string(var)) +
+    geom_histogram(binwidth = 0.5, color = "black", fill = "lightblue") +
+    labs(x = var, y = "Frequency") +
+    theme_minimal() +
+    plotTheme()
+}
+
+# Get the names of the variables
+vars <- names(data)
+
+# Plot a histogram for each variable
+plots <- lapply(vars, plot_histogram)
+
+# Print the plots
+grid.arrange(grobs = plots, ncol = 4)
+
+
+# another way to check normality 
+library(lattice)
+cat(names(data), sep = " + ")
+histogram(~IMPL_SUCC + CULT_INTG + BUDG_COMP + ORG_PERF_IMP + EMPL_SKL_IMP + DEPLOY + ACT_INTG + BUSI_IMP + TASK_COMP + STAKEH_ACC + EMPL_SAT + EMPL_BEL_IMP + DEC_IMP + LD_SUP + ORG_CUL + EMP_ATT + RES_AVL + LD_INV + PRJ_SEL + DEF_MEA + RES_CHG + LD_STL + ORG_CHR + DAT_QLT + EMP_ENG + TOOL_AP + CONTX_CUS + EFT_REQ + SCOPE + INSTIT + TRA_EDUC + WKF_SKL + EXP_CON + EXT_CON + UND_CNG + COM_KNW + PAT_RES + GOAL_CL + CUS_IDEF + GOAL_AL + SYS_COM + TEAM_ST, data = data)# this plot might not be good as imputed value shown on their own bar
+```
+
+# Multivariate normality 
+- Rn mardia's multivariate normality test 
+```{r}
+mardia(data)
+# check what test used for normality check 
+# In our case, kurtosis = -3.2 (P < 0.05). At the start and the end, the dots are away from the line. Thus, the data are not normally distributed at multivariate level. Our extraction method PAF can deal with this non-normality.
+```
+
+
+# data factorability 
+## 1. Kaiser-Meyer-Olkin (KMO)
+ 
+```{r}
+KMO(data)
+#Overall MSA =  0.86 whic h is good 
+```
+
+## 2 Bartlet’s test of sphericity
+```{r}
+cortest.bartlett(data)
+# $p.value = 5.660815e-161, which means items are correlated 
+```
+
+# Determine No. of factor 
+# 1 scree plot and eginvalue 
+```{r}
+scree(data)
+
+# based on the plot
+#  FA = 5 factor 
+#  PC  = 8 
+```
+
+# 2 parallel analysis 
+```{r}
+par <- fa.parallel(data, fm = "pa", fa = "fa")
+vss(data)
+```
+
+
+# Run factor analysis 
+```{r}
+fa <- fa(data, nfactors = 5, fm = "pa", rotate = "oblimin")
+print(fa , cut = .3, digits = 3)
+
+```
+
