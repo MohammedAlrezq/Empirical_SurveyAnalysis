@@ -160,3 +160,15 @@ library(Hmisc)
 
 ```
 
+
+to use kinti package for table 
+```{r}
+install.packages("knitr")
+library(knitr)
+
+summ <- summary(data)
+
+knitr::kable(summ)
+
+```
+
