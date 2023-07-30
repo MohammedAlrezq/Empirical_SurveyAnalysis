@@ -9,24 +9,78 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# 1 Preliminaries 
+
+## 1.1 Load libraires 
 ```{r}
 library(tidyverse)
 library(psych)# use perform EFA
+library(purrr)
+library(ggplot2)
+library(gridExtra)# to arrnge plot per row and col
 ```
 
+## 1.2 Plot visulization enhancement 
+```{r}
+plotTheme <- function() {
+  theme(
+    plot.title = element_text(size = 14, family = "sans", face = "plain", hjust = 0),
+    plot.subtitle=element_text(size = 11, family = "sans", hjust = 0),
+    plot.caption=element_text(size = 10, family = "sans", face = "italic", hjust = 0), 
+    axis.title.x = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = -0.5),
+    axis.title.y = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = 1),
+    axis.text = element_text(size = 9, family = "sans", face = "plain"),
+    panel.background = element_blank(),
+    panel.grid.minor = element_line(colour = "gray"),
+    panel.grid.major = element_line(colour = "gray"),
+    axis.ticks = element_blank(),
+    legend.title = element_text(size = 10, family = "sans"),
+    legend.text = element_text(size = 9, family = "sans"),
+    axis.line = element_blank()
+  )
+}
 
-# Upload imputed data based on the mean 
+```
+
+## 1.2 Load data 
 ```{r}
 data <- read.csv("mean_data.csv")
 
-# Remove Response.ID and col X
+# Remove Response.ID and col X from the data 
 data <- data |> 
   select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+data <- data |> 
+  mutate_if(is.integer, as.numeric)
+str(data)
+dim(data)
 ```
 
+# 2. Preliminary Steps 
+## 2.1 Descriptive statistics 
 ```{r}
-sum(complete.cases(data))# total of 67 complete cases 
+describe(data)
+```
 
+## 2.2 Check normality plot 
+```{r}
+# Function to plot a histogram for a variable
+plot_histogram <- function(var) {
+  ggplot(data, aes_string(var)) +
+    geom_histogram(binwidth = 0.5, color = "black", fill = "lightblue") +
+    labs(x = var, y = "Frequency") +
+    theme_minimal() +
+    plotTheme()
+}
 
+# Get the names of the variables
+vars <- names(data)
+
+# Plot a histogram for each variable
+plots <- lapply(vars, plot_histogram)
+
+# Print the plots
+grid.arrange(grobs = plots, ncol = 4)
 ```
 
