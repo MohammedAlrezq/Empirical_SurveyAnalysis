@@ -172,6 +172,27 @@ knitr::kable(summ)
 
 ```
 
+```{r}
+plotTheme <- function() {
+  theme(
+    plot.title = element_text(size = 14, family = "sans", face = "plain", hjust = 0),
+    plot.subtitle=element_text(size = 11, family = "sans", hjust = 0),
+    plot.caption=element_text(size = 10, family = "sans", face = "italic", hjust = 0), 
+    axis.title.x = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = -0.5),
+    axis.title.y = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = 1),
+    axis.text = element_text(size = 9, family = "sans", face = "plain"),
+    panel.background = element_blank(),
+    panel.grid.minor = element_line(colour = "gray"),
+    panel.grid.major = element_line(colour = "gray"),
+    axis.ticks = element_blank(),
+    legend.title = element_text(size = 10, family = "sans"),
+    legend.text = element_text(size = 9, family = "sans"),
+    axis.line = element_blank()
+  )
+}
+
+```
+
 # Factor analysis Steps:
 ## 1.2 Load data 
 ```{r}
@@ -222,7 +243,7 @@ histogram(~IMPL_SUCC + CULT_INTG + BUDG_COMP + ORG_PERF_IMP + EMPL_SKL_IMP + DEP
 ```
 
 # Multivariate normality 
-- Rn mardia's multivariate normality test 
+- Run mardia's multivariate normality test 
 ```{r}
 mardia(data)
 # check what test used for normality check 
@@ -261,10 +282,120 @@ vss(data)
 ```
 
 
-# Run factor analysis 
+# Run factor analysis with 5 factors
 ```{r}
-fa <- fa(data, nfactors = 5, fm = "pa", rotate = "oblimin")
-print(fa , cut = .3, digits = 3)
+Prn_ax_fac <- fa(data, nfactors = 5, fm = "pa", rotate = "oblimin")
+print(Prn_ax_fac , cut = .3, digits = 3)
 
+fa.diagram(Prn_ax_fac)
+
+```
+
+# Run factor analysis with 10 factors
+```{r}
+Prn_ax_fac_10 <- fa(data, nfactors = 10, fm = "pa", rotate = "oblimin")
+print(Prn_ax_fac_10 , cut = .3, digits = 3)
+
+fa.diagram(Prn_ax_fac_10)
+
+loading_10 <- Prn_ax_fac_10$loadings
+#write.csv(loading_10, "fact_loading_10fac.csv")
+
+# make no sense 
+
+```
+
+# Run factor analysis with 6 factors
+```{r}
+Prn_ax_fac_6 <- fa(data, nfactors = 6, fm = "pa", rotate = "oblimin")
+print(Prn_ax_fac_10 , cut = .3, digits = 3)
+
+fa.diagram(Prn_ax_fac_6)
+
+loading_6 <- Prn_ax_fac_6$loadings
+#write.csv(loading_6, "fact_loading_6fac.csv")
+
+
+```
+
+# another way: Run FA fro DVs and IVs seperatly 
+
+```{r}
+names(data)
+# dependent variables 
+DVs <- data |> 
+  select(c(1:13))
+# independent variables 
+IVs <- data |> 
+  select(c(14:42))
+```
+
+# DVs check normality 
+```{r}
+# Multivariate normality 
+mardia(DVs) # not normal 
+
+## Kaiser-Meyer-Olkin (KMO)
+KMO(DVs) # overall MSA =0.9, threshold = 0.7
+
+#Bartlet’s test of sphericity
+
+cortest.bartlett(DVs)
+#p.value = 7.086821e-94, which means items are correlated 
+```
+
+# No. of factor for DVs 
+```{r}
+scree(DVs)
+```
+
+# Run factor analysis with 6 factors
+```{r}
+Prn_ax_fac_DV_2 <- fa(DVs, nfactors = 4, fm = "pa", rotate = "oblimin")
+print(Prn_ax_fac_DV_2 , cut = .3, digits = 2)
+
+fa.diagram(Prn_ax_fac_DV_2)
+```
+
+# Independent variables 
+```{r}
+# Multivariate normality 
+mardia(IVs) # not normal 
+
+## Kaiser-Meyer-Olkin (KMO)
+KMO(IVs) # overall MSA =0.9, threshold = 0.7
+
+#Bartlet’s test of sphericity
+
+cortest.bartlett(IVs)
+#p.value = 7.086821e-94, which means items are correlated 
+```
+
+# No. of factor for IVs 
+```{r}
+scree(IVs)
+```
+
+# Run factor analysis with 4 factors
+```{r}
+Prn_ax_fac_IV <- fa(IVs, nfactors = 4, fm = "pa", rotate = "oblimin")
+print(Prn_ax_fac_IV , cut = .3, digits = 2)
+
+fa.diagram(Prn_ax_fac_IV)
+```
+
+# Run factor analysis with 5 factors
+```{r}
+Prn_ax_fac_IV_5 <- fa(IVs, nfactors = 5, fm = "pa", rotate = "oblimin")
+print(Prn_ax_fac_IV_5 , cut = .3, digits = 2)
+
+# eginvalues: these are the eginvalue from scree. often above or equal 1 
+Prn_ax_fac_IV_5$e.values
+```
+
+# Principle component analysis 
+```{r}
+pc.IVs <- principal(IVs, nfactors = 7, rotate = "oblimin")# n.factor based on scree
+print(pc.IVs, cut = 0.3, digits = 2)
 ```
 
