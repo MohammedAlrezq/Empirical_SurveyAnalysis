@@ -386,12 +386,51 @@ fa.diagram(Prn_ax_fac_IV)
 
 # Run factor analysis with 5 factors
 ```{r}
-Prn_ax_fac_IV_5 <- fa(IVs, nfactors = 5, fm = "pa", rotate = "oblimin")
+Prn_ax_fac_IV_5 <- fa(IVs, nfactors = 5, fm = "pa", rotate = "oblimin") # fm = "pa" is principle axi
 print(Prn_ax_fac_IV_5 , cut = .3, digits = 2)
 
 # eginvalues: these are the eginvalue from scree. often above or equal 1 
 Prn_ax_fac_IV_5$e.values
 ```
+
+
+# Run factor analysis with 8 factors
+```{r}
+Prn_ax_fac_IV_5 <- fa(IVs, nfactors = 5, fm = "pa", rotate = "oblimin") # fm = "pa" is principle axi
+print(Prn_ax_fac_IV_5 , cut = .3, digits = 2)
+
+# eginvalues: these are the eginvalue from scree. often above or equal 1 
+#Prn_ax_fac_IV_8$e.values
+
+IVs_loading_5 <- Prn_ax_fac_IV_5$loadings
+
+write.csv(IVs_loading_5, "IVs_loading_5.csv")
+
+## factor correlation matrix 
+factro_corr <- Prn_ax_fac_IV_5$Phi
+
+#structure matrix is the product of the loadings and the factor correlation matrix
+structure_matrix <- IVs_loading_5 %*% factro_corr
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Principle component analysis 
 ```{r}
