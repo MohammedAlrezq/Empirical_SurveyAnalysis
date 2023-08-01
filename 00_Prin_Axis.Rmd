@@ -1,0 +1,139 @@
+---
+title: "00_Prin_Axis_"
+author: "Mohammed Alrezq"
+date: "2023-07-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction 
+- This section involves working on Principal Axis Factoring (EFA) as follow:
+-- EFA is run for each category of the DVs based on the conceptual framework 
+-- EFA is run for all IVs in one model 
+
+# 1. Preliminary 
+## 1.1 Load libraires 
+```{r}
+library(tidyverse)
+library(psych)# use perform EFA
+library(purrr)
+library(ggplot2)
+library(gridExtra)# to arrnge plot per row and col
+```
+## 1.2 load data 
+```{r}
+model_00 <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X from the data 
+model_00 <- model_00 |> 
+  select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+model_00 <- model_00 |> 
+  mutate_if(is.integer, as.numeric)
+str(model_00)
+dim(model_00)
+```
+
+# 2 Statistical descriptive
+```{r}
+describe(model_00)
+```
+
+# 3 Principle Axis Factoring 
+## 3.1 Multivariate Normality  
+```{r}
+mardia(model_00)
+# check what test used for normality check 
+# In our case, kurtosis = -3.2 (P < 0.05). At the start and the end, the dots are away from the line. Thus, the data are not normally distributed at multivariate level. Our extraction method PAF can deal with this non-normality.
+```
+
+## 3.2 Kaiser-Meyer-Olkin (KMO)
+ 
+```{r}
+KMO(model_00)
+  #Overall MSA =  0.86 Sample adequacy. 0.60 and above is acceptable   
+```
+
+## 3.3 Bartlet’s test of sphericity
+```{r}
+cortest.bartlett(model_00)
+#p.value = 5.660815e-161, sig. p-value and sig. of correlation between items 
+```
+
+# 4 Plit data to DVs and IVs 
+```{r}
+names(model_00)
+# Dependent variables: General success  
+model_00_GEN_SUCC <- model_00 |> 
+  select(1, 3, 9, 10)
+# Dependent variables: LP/LSS Embeddedness   
+model_00_Embd <- model_00 |> 
+  select(2, 6, 7)
+# Dependent variables: Improved employee results   
+model_00_EMP_RES <- model_00 |> 
+  select(5, 11, 12)
+# Dependent variables: Improved organization results   
+model_00_ORG_RES <- model_00 |> 
+  select(8, 4, 13)
+
+# Dependent varaibes
+model_00_DVs <- model_00 |> 
+  select(1:13)
+# Independent variables 
+model_00_IVs <- model_00 |> 
+  select(14:42)
+```
+
+# 5 Principal Axis Factoring for DVs 
+## 5.1 determine number of factor for DVs 
+```{r}
+scree(model_00_DVs)
+# scree recommends 1 factor 
+```
+
+## 5.2 Run Factor analysis
+### Factor = 4
+```{r}
+Prn_ax_DV_4 <- fa(model_00_DVs, nfactors = 4, fm = "pa", rotate = "oblimin")
+print(Prn_ax_DV_4 , cut = .3, digits = 2)
+# maximum iteration exceeded
+```
+
+### Factor = 4 and increae number of iteration = 1000
+```{r}
+Prn_ax_DV_4.1 <- fa(model_00_DVs, nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 1000)
+print(Prn_ax_DV_4.1 , cut = .3, digits = 2)
+# no improvementby maximizing iteration 
+```
+
+### Factor = 3 
+```{r}
+Prn_ax_DV_3 <- fa(model_00_DVs, nfactors = 3, fm = "pa", rotate = "oblimin")
+print(Prn_ax_DV_3 , cut = .3, digits = 2)
+```
+
+### Factor = 3 and increae number of iteration = 1000
+```{r}
+Prn_ax_DV_3.1 <- fa(model_00_DVs, nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 1000)
+print(Prn_ax_DV_3.1 , cut = .3, digits = 2)
+# no improvementby maximizing iteration 
+```
+
+### Factor = 2 
+```{r}
+Prn_ax_DV_2 <- fa(model_00_DVs, nfactors = 2, fm = "pa", rotate = "oblimin")
+print(Prn_ax_DV_2 , cut = .3, digits = 2)
+ 
+```
+
+### Factor = 5 
+```{r}
+Prn_ax_DV_5 <- fa(model_00_DVs, nfactors = 5, fm = "pa", rotate = "oblimin")
+print(Prn_ax_DV_5 , cut = .3, digits = 2)
+ 
+
+```
