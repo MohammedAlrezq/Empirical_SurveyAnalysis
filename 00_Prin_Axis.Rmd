@@ -2,7 +2,10 @@
 title: "00_Prin_Axis_"
 author: "Mohammed Alrezq"
 date: "2023-07-31"
-output: html_document
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,12 +14,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction 
 - This section involves working on Principal Axis Factoring (EFA) as follow:
--- EFA is run for each category of the DVs based on the conceptual framework 
--- EFA is run for all IVs in one model 
+ - EFA is run for each category of the DVs based on the conceptual framework 
+ - EFA is run for all IVs in one model 
 
 # 1. Preliminary 
 ## 1.1 Load libraires 
-```{r}
+```{r, warning=FALSE}
 library(tidyverse)
 library(psych)# use perform EFA
 library(purrr)
