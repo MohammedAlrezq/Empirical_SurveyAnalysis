@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # 1. Preliminary 
 ## 1.1 Load libraires 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(psych)# use perform EFA
 library(purrr)
