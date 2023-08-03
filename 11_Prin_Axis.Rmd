@@ -13,7 +13,8 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 # 1. Preliminary 
-## 1.1 Load libraires 
+
+### 1.1 Load libraires 
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(psych)# use perform EFA
