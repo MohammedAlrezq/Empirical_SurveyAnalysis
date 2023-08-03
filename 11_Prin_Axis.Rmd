@@ -86,6 +86,7 @@ psych::cortest.bartlett(model_11)
 ```
 ## 3.3 Determinant of the correlation matrix
 - For multicollinearity or singularity in my data
+- Det. of the correlation matrix should be greater than 0.00001
 ```{r}
 det(cor(model_11))
 ```
