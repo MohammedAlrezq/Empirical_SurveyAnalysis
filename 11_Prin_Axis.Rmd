@@ -57,10 +57,25 @@ model_11 <- model_11 |>
 model_11 <- model_11 |> 
   mutate_if(is.integer, as.numeric)
 ```
+
+## 1.3 Split data to dependent and independet variables 
+```{r}
+# Dependent variables/items 
+mode_11_DVs <- model_11 |> 
+  select(1:13)
+# Independent variables/items 
+model_11_IVs <- model_11 |> 
+  select(14:42)
+```
+
 # 2 Statistical descriptive
 ## 2.1 Statistical summary  
 ```{r}
-describe(model_11)
+library(vtable)# to print summary table 
+Model_11_stat <- describe(model_11, fast = TRUE)# fast = TRUE allow to compute only common stat summary, such as mean, SD, etc.
+sumtable(model_11,
+         summ = c("mean(x)",
+                  "median(x)"))
 ```
 ## 2.2 Correlation matrix 
 ```{r}
