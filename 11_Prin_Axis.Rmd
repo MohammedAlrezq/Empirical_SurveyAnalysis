@@ -18,6 +18,7 @@ library(psych)# use perform EFA
 library(purrr)
 library(ggplot2)
 library(gridExtra)# to arrnge plot per row and col
+library(corrr)
 ```
 
 
@@ -92,7 +93,151 @@ det(cor(model_11))
 ```
 
 ```{r}
+#EMPL_SKI and ORG_IMP = 0.79
+#EMPL_SAT and STAKEH_ACC = 0.75
+#DVs = 5
+
+#IVs
+##CONTX_CUS and TOOL_AP = 0.78
+#LD_SUP and CULT_INTG =0.75
+#LD_STL and LD_INV =0.75
+#INSTIT and ACT_INTG=0.75
+#TEAM_ST and LD_STL=.75
+
+
+
 model_11_reduced <- model_11 |> 
-  select(- c())
+  select(-c(EMPL_SKI, ORG_IMP, CONTX_CUS, TOOL_AP))
+det(cor(model_11_reduced))
+# Any correlation >= 0.75 was removed 
+model_11_reduced_2 <- model_11 |> 
+  select(-c(EMPL_SKI, ORG_IMP, EMPL_SAT, STAKEH_ACC, LD_SUP, CULT_INTG, LD_STL, LD_INV, INSTIT, ACT_INTG, TEAM_ST, CONTX_CUS, TOOL_AP))
+det(cor(model_11_reduced_2))
+
+
+#ORG_IMP and IMPL_SUCC
+#EMPL_SAT and IMPL_SUCC
+#EMPL_SAT and ORG_IMP
+# EMP_ATT nd EMPL_BEL
+# PRJ_SEL and TASK_COMP
+#DEF_MEA and PRJ_SEL
+#ORG_CHR and DEF_MEA
+#DAT_QLT and DEF_MEA
+#SCOPE and EFT_REQ
+
+model_11_reduced_3 <- model_11 |> 
+  select(-c(EMPL_SKI, ORG_IMP, EMPL_SAT, STAKEH_ACC, LD_SUP, CULT_INTG, LD_STL, LD_INV, INSTIT, ACT_INTG, TEAM_ST, CONTX_CUS, TOOL_AP, IMPL_SUCC, EMP_ATT, EMPL_BEL, PRJ_SEL, TASK_COMP, DEF_MEA, ORG_CHR, DAT_QLT, SCOPE, EFT_REQ))
+det(cor(model_11_reduced_3))
+
+det(model_11_Corr)
+
 ```
+```{r}
+# get the lower triangle of the correlation matrix, as the matrix is symmetric
+lower_tri <- model_11_Corr |> 
+  lower.tri(diag = FALSE)
+
+lower_tri <- model_11_Corr |> 
+  lower.tri(diagonal = FALSE)
+
+# find the variables that have a correlation coefficient greater than 0.5
+high_cor_vars <- which(abs(lower_tri) > 0.5, arr.ind = TRUE) %>%
+  rownames()
+```
+```{r}
+
+# convert your correlation data frame to a matrix
+model_11_matrix <- as.matrix(model_11_Corr)
+
+# set the diagonal of the correlation matrix to NA
+diag(model_11_matrix) <- NA
+
+# get the lower triangle of the matrix
+lower_tri <- model_11_matrix[lower.tri(model_11_matrix)]
+
+# adjust the correlation threshold here
+cor_threshold <- 0.7  # or whatever value you choose
+
+# find the variables that have a correlation coefficient greater than the threshold
+high_cor_indices <- which(abs(lower_tri) > cor_threshold, arr.ind = TRUE) 
+
+# get the variable names
+high_cor_vars <- colnames(model_11_matrix)[unique(c(high_cor_indices[,1], high_cor_indices[,2]))]
+```
+
+
+# Split the data to DV and IV
+
+```{r}
+names(model_11)
+mode_11_DVs <- model_11 |> 
+  select(1:13)
+
+model_11_IVs <- model_11 |> 
+  select(14:42)
+```
+
+# cHECK 
+## Dependent variabels 
+```{r}
+# Correlation matrix 
+model_11_DVs_Corr <- round(cor(mode_11_DVs), 2)
+
+#Kaiser-Meyer-Olkin index (KMO)
+KMO(mode_11_DVs)
+
+#Bartlett’s test
+psych::cortest.bartlett(mode_11_DVs)
+
+#Determinant of the correlation matrix
+# - For multicollinearity or singularity in my data
+# - Det. of the correlation matrix should be greater than 0.00001
+det(cor(mode_11_DVs))
+# 0.0000018
+```
+## Independent variabels 
+```{r}
+# Correlation matrix 
+model_11_IVs_Corr <- round(cor(model_11_IVs), 2)
+#write.csv(model_11_IVs_Corr, "IVs_Correaltion.csv")
+
+#Kaiser-Meyer-Olkin index (KMO)
+KMO(model_11_IVs)
+
+#Bartlett’s test
+psych::cortest.bartlett(model_11_IVs)
+
+#Determinant of the correlation matrix
+# - For multicollinearity or singularity in my data
+# - Det. of the correlation matrix should be greater than 0.00001
+det(cor(model_11_IVs))
+# 2.8*10^-12
+```
+
+## Independent variables
+- remove correlated variables with 0.73 or above 
+```{r}
+
+# remove CONTX_CUS and TOOL_AP
+# LD_STL and LD_INV = 0.78
+#LD_STL and TEAM_ST =0.75
+#ORG_CUL and LD_SUP = 0.74
+#DEF_MEA and PRJ_SEL =0.73
+# SCOPE and EFT_REQ = 0.73
+# LD_STL and LD_SUP = 0.72
+# ORG_CHR and DEF_MEA = 0.72
+
+model_11_IVs_reduced <- model_11_IVs |> 
+  select(-c(CONTX_CUS, TOOL_AP, LD_STL, TEAM_ST, LD_INV, ORG_CUL, LD_SUP, SCOPE, EFT_REQ, LD_STL, LD_SUP, ORG_CHR, DEF_MEA))
+det(cor(model_11_IVs_reduced))
+
+#Kaiser-Meyer-Olkin index (KMO)
+KMO(model_11_IVs_reduced)
+
+#Bartlett’s test
+psych::cortest.bartlett(model_11_IVs_reduced)
+
+```
+
+
 
