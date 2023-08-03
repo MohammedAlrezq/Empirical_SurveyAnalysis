@@ -1,0 +1,97 @@
+---
+title: "11_Prin_Axis"
+author: "Mohammed Alrezq"
+date: "2023-08-03"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# 1. Preliminary 
+## 1.1 Load libraires 
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(psych)# use perform EFA
+library(purrr)
+library(ggplot2)
+library(gridExtra)# to arrnge plot per row and col
+```
+
+
+```{r}
+plotTheme <- function() {
+  theme(
+    plot.title = element_text(size = 14, family = "sans", face = "plain", hjust = 0),
+    plot.subtitle=element_text(size = 11, family = "sans", hjust = 0),
+    plot.caption=element_text(size = 10, family = "sans", face = "italic", hjust = 0), 
+    axis.title.x = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = -0.5),
+    axis.title.y = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = 1),
+    axis.text = element_text(size = 9, family = "sans", face = "plain"),
+    panel.background = element_blank(),
+    panel.grid.minor = element_line(colour = "gray"),
+    panel.grid.major = element_line(colour = "gray"),
+    axis.ticks = element_blank(),
+    legend.title = element_text(size = 10, family = "sans"),
+    legend.text = element_text(size = 9, family = "sans"),
+    axis.line = element_blank()
+  )
+}
+```
+
+## 1.2 load data
+```{r}
+model_11 <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X from the data 
+model_11 <- model_11 |> 
+  select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+model_11 <- model_11 |> 
+  mutate_if(is.integer, as.numeric)
+```
+# 2 Statistical descriptive
+## 2.1 Statistical summary  
+```{r}
+describe(model_11)
+```
+## 2.2 Correlation matrix 
+```{r}
+model_11_Corr <- round(cor(model_11), 2) # Correlation matrix
+
+write.csv(model_11_Corr, "correlation_mtx.csv")
+```
+
+# 3 Diagnostic Test 
+## 3.1 Kaiser-Meyer-Olkin index (KMO)
+
+**Kaiser’s 1974 recommendations were:**
+- bare minimum of .5
+- values between .5 and .7 as mediocre
+- values between .7 and .8 as good
+- values above .9 are superb
+```{r}
+KMO(model_11)
+
+# KMO = 0.86
+# Item level > 0.50
+```
+## 3.2 Bartlett’s test
+```{r}
+psych::cortest.bartlett(model_11)
+# P-value < 0.05 which supports PAF
+```
+## 3.3 Determinant of the correlation matrix
+- For multicollinearity or singularity in my data
+```{r}
+det(cor(model_11))
+```
+
+```{r}
+model_11_reduced <- model_11 |> 
+  select(- c())
+```
+
