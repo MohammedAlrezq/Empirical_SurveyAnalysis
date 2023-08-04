@@ -318,7 +318,7 @@ mean_imput.data <- data.CompletedCases |>
   mutate_all(function(x) ifelse(is.na(x), mean(x, na.rm = TRUE), x))
 summary(mean_imput.data)
 
-write.csv(mean_imput.data, "mean_data.csv")
+#write.csv(mean_imput.data, "mean_data.csv")
 ```
 
 
