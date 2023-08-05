@@ -1,0 +1,23 @@
+
+## 1.2 load data
+```{r}
+model_11 <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X from the data 
+model_11 <- model_11 |> 
+  select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+model_11 <- model_11 |> 
+  mutate_if(is.integer, as.numeric)
+```
+
+## 1.3 Split data to dependent and independet variables 
+```{r}
+# Dependent variables/items 
+model_11_DVs <- model_11 |> 
+  select(1:13)
+# Independent variables/items 
+model_11_IVs <- model_11 |> 
+  select(14:42)
+```
