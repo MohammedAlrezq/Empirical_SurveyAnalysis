@@ -7,7 +7,7 @@ output:
   html_document: default
   word_document: default
 editor_options:
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -66,6 +66,7 @@ model_11_DVs <- model_11 |>
 # Independent variables/items 
 model_11_IVs <- model_11 |> 
   select(14:42)
+#str(model_11_IVs)
 ```
 
 # 2 Statistical descriptive
@@ -90,7 +91,12 @@ model_11_sum.stat <- sumtable(model_11,
 ```{r}
 model_11_DV_corr <- round(cor(model_11_DVs), 2) # Correlation matrix
 
-#write.csv(model_11_Corr, "correlation_mtx.csv")
+# Plot the correlation matrix for DVs 
+library(corrplot)# to plot the correlation matrix 
+corrplot(model_11_DV_corr, 
+         method= "number",
+         tl.col = "black")# label variable in black
+
 ```
 
 ### 2.2 Diagnostic Test 
