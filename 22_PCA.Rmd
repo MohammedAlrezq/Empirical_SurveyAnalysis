@@ -1,3 +1,7 @@
+```{r}
+#options(scipen = 999)# this option is to eliminate scientific notation 
+```
+
 
 ```{r}
 library(tidyverse)
@@ -23,10 +27,257 @@ str(model_11)
 # Dependent variables/items 
 model_11_DVs <- model_11 |> 
   select(1:13)
+names(model_11_DVs)
+# to change the order of the column for DVs 
+model_11_DVs <- model_11_DVs |> 
+  relocate(IMPL_SUCC_1,BUDG_COMP_3, TASK_COMP_9, STAKEH_ACC_10,# 1st column
+           CULT_INTG_2, DEPLOY_6, ACT_INTG_7, # 2nd column
+           EMPL_SKI_5, EMPL_SAT_11, EMPL_BEL_12, # 3rd column
+           BUSI_IMP_8, ORG_IMP_4, DEC_IMP_13)# 4th column
+# To change the name/index variables 
+model_11_DVs <- model_11_DVs |> 
+  rename(
+    IMPL_SUCC_1 = IMPL_SUCC_1,
+    BUDG_COMP_2 = BUDG_COMP_3,
+    TASK_COMP_3 = TASK_COMP_9,
+    STAKEH_ACC_4 = STAKEH_ACC_10,
+    CULT_INTG_5 = CULT_INTG_2,
+    DEPLOY_6 = DEPLOY_6,
+    ACT_INTG_7 = ACT_INTG_7,
+    EMPL_SKI_8 = EMPL_SKI_5,
+    EMPL_SAT_9 = EMPL_SAT_11,
+    EMPL_BEL_10 = EMPL_BEL_12,
+    BUSI_IMP_11 = BUSI_IMP_8,
+    ORG_IMP_12 = ORG_IMP_4,
+    DEC_IMP_13 = DEC_IMP_13
+    
+  )
 # Independent variables/items 
 model_11_IVs <- model_11 |> 
   select(14:42)
-
-str(model_11_DVs)
-str(model_11_IVs)
 ```
+
+# Principle component analysis 
+### 1. correlation 
+```{r}
+model_11_DVs_corr <- round(cor(model_11_DVs), 2)
+
+# Plot correlation 
+library(corrplot)# to plot the correlation matrix 
+corrplot(model_11_DVs_corr, 
+         method= "number",
+         tl.col = "black")# label variable in black 
+```
+
+### 2. Normality 
+```{r}
+
+```
+
+
+### 3. Kaiser-Meyer-Olkin
+- used for sample adequacy and might be also for normality 
+- At the matrix level, our $KMO = .86$, which falls into Kaiser's definition of *good*. 
+```{r}
+psych::KMO(model_11_DVs)
+#Overall MSA =  0.9
+#At item level, all value above 0.5 
+```
+
+### 4. Bartlett's test
+- test if the matrix is not identiy matrix 
+```{r}
+psych::cortest.bartlett(model_11_DVs)
+```
+
+- Our Bartlett's test is significant:  $\chi ^{1}(300)=1683.76, p < .001$. This supports a component-or-factor analytic approach for investigating the data.
+
+### 4. Multicollinearity or singularity
+- Should be greater than 0.00001 (that would be 4 zeros, then the 1).  If it is smaller than 0.00001 then we may have an issue with *multicollinearity* (i.e., variables that are too highly correlated) or *singularity* (variables that are perfectly correlated).
+```{r}
+det(cor(model_11_DVs))
+```
+
+### Principle Component analysis 
+```{r}
+model_11_DVs_PCA <- psych::principal(model_11_DVs, nfactors = length(model_11_DVs), rotate = "none")
+```
+
+**Communalities** are represented as $h^2$. These are the proportions of common variance present in the variables.  A variable that has no specific (or random) variance would have a communality of 1.0.  If a variable shares none of its variance with any other variable its communality would be 0.0.
+
+**Uniquenesses* are represented as $u2$.  These are the amount of unique variance for each variable.  They are calculated as $1 - h^2$ (or 1 minus the communality).  Technically (at this point in the analysis where we have an equal number of components as items), they should all be zero, but the *psych* package is very quantsy and decimals are reported to the 15th and 16th decimal places!  (hence the u2 for Q1 is -0.0000000000000028865799).
+
+The final column, *com*, represents *item complexity.*  This is an indication of how well an item reflects a single construct. If it is 1.0 then the item loads only on one component, if it is 2.0, it loads evenly on two components, and so forth. For now, we can ignore this. *I mostly wanted to reassure you that "com" is not "communality"; h2 is communality*.
+
+Let's switch to the first screen of output.
+
+**Eigenvalues** are displayed in the row called *SS loadings* (i.e., the sum of squared loadings).  They represent the variance explained by the particular linear component. PC1 explains 0.85  units of variance (out of a possible 13, the total  of components).  As a proportion, this is 0.85/13 = 0.16 (reported in the *Proportion Var* row).
+```{r}
+# first component = 7.9
+# # no. of items = 13
+7.9/13 = 0.61
+
+# 0.61 proportion var for PC1. see output 
+```
+
+### Scree plot 
+Eigenvalues are stored in the **model_11_DVs_PCA** object's variable, "values". We can see all the values captured by this object with the *names()* function:
+
+```{r}
+names(model_11_DVs_PCA)# to show all value in object PC.
+```
+
+-  values are the eigenvalues sotred in PC object **model_11_DVs_PCA**
+```{r}
+plot(model_11_DVs_PCA$values, type = "b")
+```
+- based on SS loading:
+- we can see first eignvalue is about 7.9, and big drop in eginvlaue to 0.99 and upto 0.77 in 4th component 
+Rule to detemine no. of componenet:
+ - eignvalue > 1 
+ - eignvlaue > 0.77 
+ 
+### Rerun PCA with 4 component from previous step 
+```{r}
+model_11_DVs_PCA4 <- psych::principal(model_11_DVs, nfactors = 4, rotate = "none")
+
+```
+
+- ss loading is same 
+- now check communiality: which is the proportion of common variant within a variable. PCA assumes all variance is common
+- Now we see that 73% of the variance associate with IMPL_SUCC_1 is common/shared (the $h2$ value).  
+
+#### Rotation
+```{r}
+model_11_DVs_PCA_Obl <- psych::principal(model_11_DVs, nfactors = 4, rotate = "Varimax")
+
+```
+
+We can make it a little easier to interpret by removing all factor loadings below .30.
+
+```{r }
+psy_table <- psych::print.psych(model_11_DVs_PCA_Obl, cut = 0.3, sort=TRUE)
+# cut = anything below .3 remove for factor loading 
+# sort = is to sort 
+```
+
+We can also create a figure of the result.
+
+```{r }
+psych::fa.diagram(model_11_DVs_PCA_Obl)
+```
+
+#### Oblique rotation: 4 factors 
+```{r}
+model_11_DVs_PCA_rotationOblq <- psych::principal(model_11_DVs, nfactors = 4, rotate = "oblimin")
+
+```
+
+- easy to read 
+```{r }
+psy_table_Obl <- psych::print.psych(model_11_DVs_PCA_rotationOblq, cut = 0.3, sort=TRUE)
+# cut = anything below .3 remove for factor loading 
+# sort = is to sort 
+```
+
+### with 3 factor using oblimin
+```{r}
+model_11_DVs_PCA_rotationOblq3 <- psych::principal(model_11_DVs, nfactors = 3, rotate = "oblimin")
+
+```
+
+- easy to read 
+```{r }
+psy_table_Obl3 <- psych::print.psych(model_11_DVs_PCA_rotationOblq3, cut = 0.3, sort=TRUE)
+# cut = anything below .3 remove for factor loading 
+# sort = is to sort 
+```
+
+Obtaining the structure matrix requires two steps. First, multiply the factor loadings with the phi matrix.
+
+```{r }
+#names(model_11_DVs_PCA_rotationOblq)
+model_11_DVs_PCA_rotationOblq$loadings %*% model_11_DVs_PCA_rotationOblq$Phi
+```
+
+##################################################
+### Principle Axis factor 
+# number of factor determination?
+
+```{r }
+model_11_DVs_FA_4 <- psych::fa(model_11_DVs, nfactors = 4, fm = "pa", rotate = "none") #can copy prior script, but change nfactors and object name
+model_11_DVs_FA_4
+```
+
+### reproduced correlation matrix
+- this is for residuals 
+
+```{r }
+round(psych::factor.model(model_11_DVs_FA_4$loadings), 3)#produces the reproduced correlation matrix
+```
+
+### uisng factor.residuals() to see the difference between corr matrix and reproduced matrix 
+```{r }
+round(psych::factor.residuals(model_11_DVs_corr, model_11_DVs_FA_4$loadings), 3)
+```
+
+```{r }
+grmsPAF2_resids <- psych::factor.residuals(model_11_DVs_corr, model_11_DVs_FA_4$loadings)#first extract the resids
+grmsPAF2_resids <- as.matrix(grmsPAF2_resids[upper.tri(grmsPAF2_resids)])#the object has the residuals in a single column
+head(grmsPAF2_resids)
+```
+
+
+```{r }
+large.resid <- abs(grmsPAF2_resids) > 0.05
+#large.resid
+sum(large.resid)
+round(sum(large.resid) / nrow(grmsPAF2_resids),3)
+```
+
+# if greter thn 0.08, consider add more factor 
+```{r }
+round(sqrt(mean(grmsPAF2_resids^2)), 3)
+```
+
+```{r }
+hist(grmsPAF2_resids)
+```
+
+## run with few factor than 
+```{r }
+model_11_DVs_FA_TRY <- psych::fa(model_11_DVs, nfactors = 7, fm = "pa", max.iter = 200, rotate = "none") 
+model_11_DVs_FA_TRY
+```
+
+### scree
+```{r}
+names(model_11_DVs_FA_TRY)
+plot(model_11_DVs_FA_TRY$values, type = "b")
+
+scree(model_11_DVs)
+```
+
+
+### factor with 4, 3 , and 2
+```{r}
+factor_4 <- psych::fa(model_11_DVs, nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+
+psych::print.psych(factor_4, cut = 0.3, sort=TRUE)
+```
+
+## factor with 3 
+```{r}
+factor_3 <- psych::fa(model_11_DVs, nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+
+psych::print.psych(factor_3, cut = 0.3, sort=TRUE)
+```
+
+
+## factor with 2 
+```{r}
+factor_2 <- psych::fa(model_11_DVs, nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
+
+psych::print.psych(factor_2, cut = 0.3, sort=TRUE)
+```
+
