@@ -321,6 +321,39 @@ summary(mean_imput.data)
 #write.csv(mean_imput.data, "mean_data.csv")
 ```
 
+## Reorder the survey items 
+- by making items for each category next to each other for DVs (1 - 13) and IVs (1 - 29)
+```{r}
+names(mean_imput.data)
+
+# to change the order of the column for DVs 
+mean_imput.data <- mean_imput.data |> 
+  relocate(Response.ID,
+           IMPL_SUCC_1,BUDG_COMP_3, TASK_COMP_9, STAKEH_ACC_10,# 1st General success 
+           CULT_INTG_2, DEPLOY_6, ACT_INTG_7, # 2nd LP/LSS Embeddedness 
+           EMPL_SKI_5, EMPL_SAT_11, EMPL_BEL_12, # 3rd Employee results 
+           BUSI_IMP_8, ORG_IMP_4, DEC_IMP_13)# 4th Organization results 
+
+# To change the name/index variables 
+mean_imput.data <- mean_imput.data |> 
+  rename(
+    IMPL_SUCC_1 = IMPL_SUCC_1,
+    BUDG_COMP_2 = BUDG_COMP_3,
+    TASK_COMP_3 = TASK_COMP_9,
+    STAKEH_ACC_4 = STAKEH_ACC_10,
+    CULT_INTG_5 = CULT_INTG_2,
+    DEPLOY_6 = DEPLOY_6,
+    ACT_INTG_7 = ACT_INTG_7,
+    EMPL_SKI_8 = EMPL_SKI_5,
+    EMPL_SAT_9 = EMPL_SAT_11,
+    EMPL_BEL_10 = EMPL_BEL_12,
+    BUSI_IMP_11 = BUSI_IMP_8,
+    ORG_IMP_12 = ORG_IMP_4,
+    DEC_IMP_13 = DEC_IMP_13)
+
+
+#write.csv(mean_imput.data, "mean_data.csv")
+```
 
 
 
