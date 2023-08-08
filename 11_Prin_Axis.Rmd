@@ -3,9 +3,9 @@ title: "11_Prin_Axis"
 author: "Mohammed Alrezq"
 date: "2023-08-03"
 output:
-  pdf_document: default
   html_document: default
   word_document: default
+  pdf_document: default
 editor_options:
   chunk_output_type: console
 ---
@@ -63,6 +63,7 @@ model_11 <- model_11 |>
 # Dependent variables/items 
 model_11_DVs <- model_11 |> 
   select(1:13)
+#str(model_11_DVs)
 # Independent variables/items 
 model_11_IVs <- model_11 |> 
   select(14:42)
@@ -73,21 +74,23 @@ model_11_IVs <- model_11 |>
 ## 2.1 Statistical summary for all variables/itmes 
 ```{r}
 library(vtable)# to print summary table 
-Model_11_stat <- describe(model_11, fast = TRUE)# fast = TRUE allow to compute only common stat summary, such as mean, SD, etc.
+Model_11_stat <- describe(model_11)# fast = TRUE allow to compute only common stat summary, such as mean, SD, etc.
 model_11_sum.stat <- sumtable(model_11,
          summ = c('notNA(x)',
                   'mean(x)',
                   'median(x)',
                   'sd(x)',
                   'min(x)',
-                  'max(x)'),
+                  'max(x)',
+                  'skew(x)',
+                  'kurtosi(x)'),
          title = "Descriptive Statistic of variables/itmes")
 
 #psych::describe(model_11, fast = TRUE)
 ```
 
-## 2 Principle Axis factoring for Dependent Variables/items
-### 2.1 Correlation Matrix 
+## 2 Principle Axis factoring 
+### 2.1 Correlation Matrix for Dependent variabels  
 ```{r}
 model_11_DV_corr <- round(cor(model_11_DVs), 2) # Correlation matrix
 
@@ -95,13 +98,33 @@ model_11_DV_corr <- round(cor(model_11_DVs), 2) # Correlation matrix
 library(corrplot)# to plot the correlation matrix 
 corrplot(model_11_DV_corr, 
          method= "number",
-         tl.col = "black")# label variable in black
+         tl.col = "black",
+         )# label variable in black
+
+```
+### 2.1 Correlation Matrix for Independent variables  
+```{r}
+model_11_IV_corr <- round(cor(model_11_IVs), 2) # Correlation matrix
+#write.csv(model_11_IV_corr, "IVs_correlation_matrix.csv")
+
+# Plot the correlation matrix for DVs 
+library(corrplot)# to plot the correlation matrix 
+corrplot(model_11_IV_corr, 
+         method= "number",
+         tl.col = "black",# label variable in black
+         number.cex = 0.6)
 
 ```
 
 ### 2.2 Diagnostic Test 
+#### Normaliyt check for dependent variabels 
+```{r}
+
+```
+
 #### A.Kaiser-Meyer-Olkin index (KMO)
 
+* *KMO for DVs *
 **Kaiser’s 1974 recommendations were:**
 - bare minimum of .5
 - values between .5 and .7 as mediocre
@@ -113,151 +136,137 @@ KMO(model_11_DVs)
 # KMO = 0.90
 # Variables at item level > 0.50, which is adequate for sample size 
 ```
+* *KMO for IVs* 
+```{r}
+KMO(model_11_IVs)
+
+# KMO = 0.87
+# Variables at item level > 0.50, which is adequate for sample size 
+```
+
 #### B.Bartlett’s test
+* *Barlett’s for DVs* 
 * A significant Barlett’s ($p < 0.05$) tells that the $R$-matrix is not an identity matrix. That is, there are some relationships between variables that can be analyzed
-- The result of $p-value = 0.7.08*10^94$
+* The result of $p-value = 0.7.08*10^94$
 
 ```{r}
 psych::cortest.bartlett(model_11_DVs)
 ```
+* *Barlett’s for IVs* 
+* The result of $p-value = 0.7.08*10^94$
+
+```{r}
+psych::cortest.bartlett(model_11_IVs)
+```
+
 #### C. Multicollinearity or singularity in my data
+* *Multicollinearity for DVs*
 * Determinant of the correlation matrix
 - Det. of the correlation matrix should be greater than 0.00001
 - The result of deteriminant is $1.802578e-05$
 ```{r}
 det(cor(model_11_DVs))
 ```
-
-### D. Principle Axis Factoring 
+* *Multicollinearity for IVs*
 ```{r}
-model_11_DV_4F <- psych::fa(model_11_DVs, nfactors = 4, fm = "pa", rotate = "none")
-```
-### E. scree
-```{r}
-# to check all the info within PAF
-names(model_11_DV_4F)
-
-# Scree plot 
-plot(model_11_DV_4F$values, type = "b")
-
-
-```
-
-
-
-```{r}
-#EMPL_SKI and ORG_IMP = 0.79
-#EMPL_SAT and STAKEH_ACC = 0.75
-#DVs = 5
-
-#IVs
-##CONTX_CUS and TOOL_AP = 0.78
-#LD_SUP and CULT_INTG =0.75
-#LD_STL and LD_INV =0.75
-#INSTIT and ACT_INTG=0.75
-#TEAM_ST and LD_STL=.75
-
-
-
-model_11_reduced <- model_11 |> 
-  select(-c(EMPL_SKI, ORG_IMP, CONTX_CUS, TOOL_AP))
-det(cor(model_11_reduced))
-# Any correlation >= 0.75 was removed 
-model_11_reduced_2 <- model_11 |> 
-  select(-c(EMPL_SKI, ORG_IMP, EMPL_SAT, STAKEH_ACC, LD_SUP, CULT_INTG, LD_STL, LD_INV, INSTIT, ACT_INTG, TEAM_ST, CONTX_CUS, TOOL_AP))
-det(cor(model_11_reduced_2))
-
-
-#ORG_IMP and IMPL_SUCC
-#EMPL_SAT and IMPL_SUCC
-#EMPL_SAT and ORG_IMP
-# EMP_ATT nd EMPL_BEL
-# PRJ_SEL and TASK_COMP
-#DEF_MEA and PRJ_SEL
-#ORG_CHR and DEF_MEA
-#DAT_QLT and DEF_MEA
-#SCOPE and EFT_REQ
-
-model_11_reduced_3 <- model_11 |> 
-  select(-c(EMPL_SKI, ORG_IMP, EMPL_SAT, STAKEH_ACC, LD_SUP, CULT_INTG, LD_STL, LD_INV, INSTIT, ACT_INTG, TEAM_ST, CONTX_CUS, TOOL_AP, IMPL_SUCC, EMP_ATT, EMPL_BEL, PRJ_SEL, TASK_COMP, DEF_MEA, ORG_CHR, DAT_QLT, SCOPE, EFT_REQ))
-det(cor(model_11_reduced_3))
-
-det(model_11_Corr)
-
-```
-# Split the data to DV and IV
-
-```{r}
-names(model_11)
-mode_11_DVs <- model_11 |> 
-  select(1:13)
-
-model_11_IVs <- model_11 |> 
-  select(14:42)
-```
-
-# cHECK 
-## Dependent variabels 
-
-```{r}
-# Correlation matrix 
-model_11_DVs_Corr <- round(cor(mode_11_DVs), 2)
-
-#Kaiser-Meyer-Olkin index (KMO)
-KMO(mode_11_DVs)
-
-#Bartlett’s test
-psych::cortest.bartlett(mode_11_DVs)
-
-#Determinant of the correlation matrix
-# - For multicollinearity or singularity in my data
-# - Det. of the correlation matrix should be greater than 0.00001
-det(cor(mode_11_DVs))
-# 0.0000018
-```
-## Independent variabels 
-```{r}
-# Correlation matrix 
-model_11_IVs_Corr <- round(cor(model_11_IVs), 2)
-#write.csv(model_11_IVs_Corr, "IVs_Correaltion.csv")
-
-#Kaiser-Meyer-Olkin index (KMO)
-KMO(model_11_IVs)
-
-#Bartlett’s test
-psych::cortest.bartlett(model_11_IVs)
-
-#Determinant of the correlation matrix
-# - For multicollinearity or singularity in my data
-# - Det. of the correlation matrix should be greater than 0.00001
 det(cor(model_11_IVs))
-# 2.8*10^-12
 ```
+- Note theree might be multicollinearity with DVs (2.815678e-12) < 0.00001
 
-## Independent variables
-- remove correlated variables with 0.73 or above 
+### Principle Axis Factoring 
+
+* Determine number of factor for DVs 
+*Number of factor using with no rotation*
 ```{r}
-
-# remove CONTX_CUS and TOOL_AP
-# LD_STL and LD_INV = 0.78
-#LD_STL and TEAM_ST =0.75
-#ORG_CUL and LD_SUP = 0.74
-#DEF_MEA and PRJ_SEL =0.73
-# SCOPE and EFT_REQ = 0.73
-# LD_STL and LD_SUP = 0.72
-# ORG_CHR and DEF_MEA = 0.72
-
-model_11_IVs_reduced <- model_11_IVs |> 
-  select(-c(CONTX_CUS, TOOL_AP, LD_STL, TEAM_ST, LD_INV, ORG_CUL, LD_SUP, SCOPE, EFT_REQ, LD_STL, LD_SUP, ORG_CHR, DEF_MEA))
-det(cor(model_11_IVs_reduced))
-
-#Kaiser-Meyer-Olkin index (KMO)
-KMO(model_11_IVs_reduced)
-
-#Bartlett’s test
-psych::cortest.bartlett(model_11_IVs_reduced)
-
+model_11_DV_F <- psych::fa(model_11_DVs,nfactors = 7, fm = "pa", rotate = "none", max.iter = 100)
+# no. of factor > 1.0 or 0.77 is 2 factor 
 ```
+* Determine number of factor for IVs 
+*Number of factor using with no rotation*
+```{r}
+model_11_IV_F <- psych::fa(model_11_IVs,nfactors = 10, fm = "pa", rotate = "none", max.iter = 100)
+# no. of factor > 1.0 or 0.77 is 5 factor and the 6th factor is 0.76
+```
+
+*Number of factor using scree plot for DVs*
+```{r}
+scree(model_11_DVs)
+# roughly 2 factor 
+```
+
+*Number of factor using scree plot for IVs*
+```{r}
+scree(model_11_IVs)
+# roughly 3 factors or 4 
+```
+
+*Number of factor using parallel analysis for DVs*
+
+```{r}
+fa.parallel(model_11_DVs)
+# roughly 2 factor 
+```
+
+*Number of factor using parallel analysis for IVs*
+
+```{r}
+fa.parallel(model_11_IVs)
+# suggested 4 to 5 factors  
+```
+
+* Run Factor with determined factor number for *DVs *
+```{r}
+# with factor = 3
+set.seed(1234)
+model_11_DV_F3 <- psych::fa(model_11_DVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_F3, cut = 0.3, sort=TRUE)
+```
+
+```{r}
+# with factor = 2
+set.seed(1245)
+model_11_DV_F2 <- psych::fa(model_11_DVs,nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
+```
+
+```{r}
+# with factor = 4
+set.seed(12454)
+model_11_DV_F4 <- psych::fa(model_11_DVs,nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_F4, cut = 0.3, sort=TRUE)
+```
+
+
+* Run Factor with determined factor number for *IVs*
+```{r}
+# with factor = 6
+set.seed(3233)
+model_11_IV_F6 <- psych::fa(model_11_IVs,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F6, cut = 0.3, sort=TRUE)
+```
+
+```{r}
+# with factor = 5
+set.seed(232333)
+model_11_IV_F5 <- psych::fa(model_11_IVs,nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
+```
+
+```{r}
+# with factor = 4
+set.seed(2322)
+model_11_IV_F4 <- psych::fa(model_11_IVs,nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F4, cut = 0.3, sort=TRUE)
+```
+
+```{r}
+# with factor = 3
+set.seed(23225)
+model_11_IV_F3 <- psych::fa(model_11_IVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F3, cut = 0.3, sort=TRUE)
+```
+
+
 
 
 
