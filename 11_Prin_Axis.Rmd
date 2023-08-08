@@ -85,7 +85,7 @@ model_11_sum.stat <- sumtable(model_11,
                   'skew(x)',
                   'kurtosi(x)'),
          title = "Descriptive Statistic of variables/itmes")
-
+model_11_sum.stat
 #psych::describe(model_11, fast = TRUE)
 ```
 
