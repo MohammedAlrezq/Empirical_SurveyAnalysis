@@ -87,6 +87,7 @@ model_11_sum.stat <- sumtable(model_11,
          title = "Descriptive Statistic of variables/itmes")
 model_11_sum.stat
 #psych::describe(model_11, fast = TRUE)
+#
 ```
 
 ## 2 Principle Axis factoring 
@@ -100,6 +101,8 @@ corrplot(model_11_DV_corr,
          method= "number",
          tl.col = "black",
          )# label variable in black
+
+pairs.panels(model_11_DVs, pch = '.', lm = T, ellipses = F, scale = F, method = "pearson")
 
 ```
 ### 2.1 Correlation Matrix for Independent variables  
@@ -119,8 +122,15 @@ corrplot(model_11_IV_corr,
 ### 2.2 Diagnostic Test 
 #### Normaliyt check for dependent variabels 
 ```{r}
-
+# install.packages("MVN")
+# library(MVN)
+model_11_DVs_Norm <- mardia(model_11_DVs, plot = TRUE)
+# 
+# mvn(model_11_DVs, mvnTest = "mardia")
+# IV <- mvn(model_11_IVs, mvnTest = "mardia")
 ```
+
+
 
 #### A.Kaiser-Meyer-Olkin index (KMO)
 
