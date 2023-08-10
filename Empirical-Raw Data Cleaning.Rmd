@@ -351,6 +351,38 @@ mean_imput.data <- mean_imput.data |>
     ORG_IMP_12 = ORG_IMP_4,
     DEC_IMP_13 = DEC_IMP_13)
 
+mean_imput.data <- mean_imput.data |> 
+  rename(
+    LD_SUP_1 = LD_SUP_14,
+    ORG_CUL_2 = ORG_CUL_15,
+    EMP_ATT_3 = EMP_ATT_16,
+    RES_AVL_4 = RES_AVL_17,
+    LD_INV_5 = LD_INV_18,
+    PRJ_SEL_6 = PRJ_SEL_19,
+    DEF_MEA_7 = DEF_MEA_20,
+    RES_CHG_8 = RES_CHG_21,
+    LD_STL_9 = LD_STL_22,
+    ORG_CHR_10 = ORG_CHR_23,
+    DAT_QLT_11 = DAT_QLT_24,
+    EMP_ENG_12 = EMP_ENG_25,
+    TOOL_AP_13 = TOOL_AP_26,
+    CONTX_CUS_14 = CONTX_CUS_27,
+    EFT_REQ_15 = EFT_REQ_28,
+    SCOPE_16 = SCOPE_29,
+    INSTIT_17 = INSTIT_30,
+    TRA_EDUC_18 = TRA_EDUC_31,
+    WKF_SKL_19 = WKF_SKL_32,
+    EXP_CON_20 = EXP_CON_33,
+    EXT_CON_21 = EXT_CON_34,
+    UND_CNG_22 = UND_CNG_35,
+    COM_KNW_23 = COM_KNW_36,
+    PAT_RES_24 = PAT_RES_37,
+    GOAL_CL_25 = GOAL_CL_38,
+    CUS_IDEF_26 = CUS_IDEF_39,
+    GOAL_AL_27 = GOAL_AL_40,
+    SYS_COM_28 = SYS_COM_41,
+    TEAM_ST_29 = TEAM_ST_42
+  )
 
 #write.csv(mean_imput.data, "mean_data.csv")
 ```
