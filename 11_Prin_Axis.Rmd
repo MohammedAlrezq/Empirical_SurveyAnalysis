@@ -7,7 +7,7 @@ output:
   word_document: default
   pdf_document: default
 editor_options:
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -99,6 +99,7 @@ model_11_DV_corr <- round(cor(model_11_DVs), 2) # Correlation matrix
 # To save plot in folder from corrplot, follow the steps: 1, 2, and then 3
 library(corrplot)# to plot the correlation matrix 
 #1
+library(here)
 png(filename = here("plot_folder", "DVs_Correlation matrix.png"), width = 2000, height = 2000, res = 300)
 #2
 corrplot(model_11_DV_corr, 
@@ -121,11 +122,20 @@ model_11_IV_corr <- round(cor(model_11_IVs), 2) # Correlation matrix
 
 # Plot the correlation matrix for DVs 
 library(corrplot)# to plot the correlation matrix 
+library(here)
+png(filename = here("plot_folder", "IVs_Correlation matrix.png"), width = 2000, height = 2000, res = 300)
+
 corrplot(model_11_IV_corr, 
          method = "number",
          tl.col = "black",# label variable in black
-         number.cex = 0.6)
+         number.cex = 0.6,
+         title = "Independent Measured Items Correlation", 
+         line = -2, # moves the title closer to the plot
+         cex.main = 1.5) # adjusts the size of the title
 
+
+#3
+dev.off()
 ```
 
 ### 2.2 Diagnostic Test 
@@ -154,6 +164,29 @@ KMO(model_11_DVs)
 
 # KMO = 0.90
 # Variables at item level > 0.50, which is adequate for sample size 
+# 
+# Plot the value 
+items_Dv <- c("IMPL_SUCC_1", "BUDG_COMP_2", "TASK_COMP_3", "STAKEH_ACC_4", "CULT_INTG_5", "DEPLOY_6", 
+           "ACT_INTG_7", "EMPL_SKI_8", "EMPL_SAT_9", "EMPL_BEL_10", "BUSI_IMP_11", "ORG_IMP_12", "DEC_IMP_13")
+
+values_DV <- c(0.96, 0.89, 0.89, 0.94, 0.89, 0.83, 0.86, 0.95, 0.86, 0.76, 0.95, 0.88, 0.94)
+
+KMO_DVs <- data.frame(Items = items_Dv, Value = values_DV)
+
+MSA_DVs <- ggplot(KMO_DVs, aes(x = reorder(Items, Value), y = Value)) + 
+  geom_bar(stat = "identity", fill = "lightblue") + 
+  coord_flip() + # function is used to swap the x and y axes so that the items are displayed horizontally
+  labs(title = "MSA for Each Dependent Measured Item", 
+       subtitle =  "Overall MSA =  0.9", 
+       x = "Item", 
+       y = "MSA Value") +
+  #theme_minimal() +
+  plotTheme()
+
+# Save plot 
+# library(here)# use to direct saving the plot in "plot_folder" and fucntion "here"
+library(here)
+ggsave(filename = here("plot_folder", "KMO_DVs.png"), plot = MSA_DVs)
 ```
 * *KMO for IVs* 
 ```{r}
@@ -161,6 +194,40 @@ KMO(model_11_IVs)
 
 # KMO = 0.87
 # Variables at item level > 0.50, which is adequate for sample size 
+# 
+# Plot the value 
+items_Iv <- c("LD_SUP_1", "ORG_CUL_2", "EMP_ATT_3", "RES_AVL_4", "LD_INV_5", "PRJ_SEL_6", "DEF_MEA_7", "RES_CHG_8", "LD_STL_9", "ORG_CHR_10", "DAT_QLT_11", "EMP_ENG_12", "TOOL_AP_13", "CONTX_CUS_14", "EFT_REQ_15", "SCOPE_16", "INSTIT_17", "TRA_EDUC_18", "WKF_SKL_19", "EXP_CON_20", "EXT_CON_21", "UND_CNG_22", "COM_KNW_23", "PAT_RES_24", "GOAL_CL_25", "CUS_IDEF_26", "GOAL_AL_27", "SYS_COM_28", "TEAM_ST_29")
+
+values_IV <- c(0.86, 0.91, 0.87, 0.75, 0.90, 0.87, 0.92, 0.91, 0.92, 0.90, 0.79, 0.89, 0.85, 0.84, 0.84, 
+            0.88, 0.90, 0.86, 0.89, 0.87, 0.85, 0.77, 0.85, 0.80, 0.84, 0.89, 0.92, 0.85, 0.91)
+
+KMO_IVs <- data.frame(Items = items_Iv, Value = values_IV)
+
+MSA_IVs <- ggplot(KMO_IVs, aes(x = reorder(Items, Value), y = Value)) + 
+  geom_bar(stat = "identity", fill = "lightblue") + 
+  coord_flip() + # function is used to swap the x and y axes so that the items are displayed horizontally
+  labs(title = "MSA for Each Independent Measured Item", 
+       subtitle =  "Overall MSA =  0.87", 
+       x = "Item", 
+       y = "MSA Value") +
+  #theme_minimal() +
+  plotTheme()
+
+# Save plot 
+# library(here)# use to direct saving the plot in "plot_folder" and fucntion "here"
+library(here)
+ggsave(filename = here("plot_folder", "KMO_IVs.png"), plot = MSA_IVs)
+
+
+bubble_plot <- ggplot(KMO_IVs, aes(x = reorder(Items, Value), y = Value, size = Value)) + 
+  geom_point(alpha = 0.7, fill = "blue") + 
+  scale_size_continuous(range = c(3, 25)) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
+  labs(title = "MSA for Each Independent Measured Item", 
+       subtitle =  "Overall MSA =  0.87", 
+       x = "Independent Measured Item", 
+       y = "MSA Value/Itme") +
+  plotTheme()
 ```
 
 #### B.Bartlett’s test
@@ -209,21 +276,43 @@ model_11_IV_F <- psych::fa(model_11_IVs,nfactors = 10, fm = "pa", rotate = "none
 
 *Number of factor using scree plot for DVs*
 ```{r}
-scree(model_11_DVs, main = "Scree plot for DVs")
+#scree(model_11_DVs, main = "Scree plot for DVs")
 # roughly 2 factor 
+
+# Set up the PNG device
+png(filename = here("plot_folder", "Scree plot for DVs.png"))
+
+# Plot
+scree(model_11_DVs, main = "Scree plot for Dependent Measured Items")
+
+# Turn off the device (this saves the plot)
+dev.off()
+
 ```
 
 *Number of factor using scree plot for IVs*
 ```{r}
-scree(model_11_IVs, main = "Scree Plot for IVs Items")
+# Set up the PNG device
+png(filename = here("plot_folder", "Scree plot for IVs.png"))
+
+scree(model_11_IVs, main = "Scree Plot for Independent Measured Items")
 # roughly 3 factors or 4 
+
+# Turn off the device (this saves the plot)
+dev.off()
 ```
 
 *Number of factor using parallel analysis for DVs*
 
 ```{r}
-fa.parallel(model_11_DVs, main = "Parallel Analysis for DVs Items")
+# Set up the PNG device
+png(filename = here("plot_folder", "Parallel Analysis for DVs.png"))
+
+fa.parallel(model_11_DVs, main = "Parallel Analysis for Dependent Measured Items")
 # roughly 2 factor 
+
+# Turn off the device (this saves the plot)
+dev.off()
 ```
 
 *Number of factor using parallel analysis for IVs*
