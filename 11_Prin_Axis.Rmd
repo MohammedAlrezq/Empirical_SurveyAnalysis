@@ -218,16 +218,6 @@ MSA_IVs <- ggplot(KMO_IVs, aes(x = reorder(Items, Value), y = Value)) +
 library(here)
 ggsave(filename = here("plot_folder", "KMO_IVs.png"), plot = MSA_IVs)
 
-
-bubble_plot <- ggplot(KMO_IVs, aes(x = reorder(Items, Value), y = Value, size = Value)) + 
-  geom_point(alpha = 0.7, fill = "blue") + 
-  scale_size_continuous(range = c(3, 25)) +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))+
-  labs(title = "MSA for Each Independent Measured Item", 
-       subtitle =  "Overall MSA =  0.87", 
-       x = "Independent Measured Item", 
-       y = "MSA Value/Itme") +
-  plotTheme()
 ```
 
 #### B.Bartlett’s test
@@ -318,8 +308,14 @@ dev.off()
 *Number of factor using parallel analysis for IVs*
 
 ```{r}
-fa.parallel(model_11_IVs, main = "Parallel Analysis for IVs Items")
+# Set up the PNG device
+png(filename = here("plot_folder", "Parallel Analysis for IVs.png"))
+
+fa.parallel(model_11_IVs, main = "Parallel Analysis for Independent Measured Items")
 # suggested 4 to 5 factors  
+
+# Turn off the device (this saves the plot)
+dev.off()
 ```
 
 * Run Factor with determined factor number for *DVs *
@@ -367,6 +363,9 @@ mean(model_11_IV_F6$communality)
 set.seed(232333)
 model_11_IV_F5 <- psych::fa(model_11_IVs,nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
+
+# Mean communality
+mean(model_11_IV_F5$communality)
 ```
 
 ```{r}
@@ -374,6 +373,9 @@ psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
 set.seed(2322)
 model_11_IV_F4 <- psych::fa(model_11_IVs,nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F4, cut = 0.3, sort=TRUE)
+
+# mean communality 
+mean(model_11_IV_F4$communality)
 ```
 
 ```{r}
@@ -381,6 +383,9 @@ psych::print.psych(model_11_IV_F4, cut = 0.3, sort=TRUE)
 set.seed(23225)
 model_11_IV_F3 <- psych::fa(model_11_IVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F3, cut = 0.3, sort=TRUE)
+
+# Mean communality 
+mean(model_11_IV_F3$communality)
 ```
 
 
