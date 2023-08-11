@@ -95,15 +95,24 @@ model_11_sum.stat
 ```{r}
 model_11_DV_corr <- round(cor(model_11_DVs), 2) # Correlation matrix
 
-# Plot the correlation matrix for DVs 
+# Plot the correlation matrix for DVs
+# To save plot in folder from corrplot, follow the steps: 1, 2, and then 3
 library(corrplot)# to plot the correlation matrix 
+#1
+png(filename = here("plot_folder", "DVs_Correlation matrix.png"), width = 2000, height = 2000, res = 300)
+#2
 corrplot(model_11_DV_corr, 
          method= "number",
-         tl.col = "black",
-         )# label variable in black
+         tl.col = "black",# label variable in black
+         title = "Dependent Measured Items Correlation", 
+         line = -1, # moves the title closer to the plot
+         cex.main = 1.5) # adjusts the size of the title
+model_11_DV_corr
+# Save plot in the plot folder
+library(here)# use to direct saving the plot in "plot_folder" and fucntion "here"
 
-pairs.panels(model_11_DVs, pch = '.', lm = T, ellipses = F, scale = F, method = "pearson")
-
+#3
+dev.off()
 ```
 ### 2.1 Correlation Matrix for Independent variables  
 ```{r}
@@ -113,7 +122,7 @@ model_11_IV_corr <- round(cor(model_11_IVs), 2) # Correlation matrix
 # Plot the correlation matrix for DVs 
 library(corrplot)# to plot the correlation matrix 
 corrplot(model_11_IV_corr, 
-         method= "number",
+         method = "number",
          tl.col = "black",# label variable in black
          number.cex = 0.6)
 
@@ -181,7 +190,7 @@ det(cor(model_11_DVs))
 ```{r}
 det(cor(model_11_IVs))
 ```
-- Note theree might be multicollinearity with DVs (2.815678e-12) < 0.00001
+- Note there might be multicollinearity with DVs (2.815678e-12) < 0.00001
 
 ### Principle Axis Factoring 
 
@@ -200,31 +209,39 @@ model_11_IV_F <- psych::fa(model_11_IVs,nfactors = 10, fm = "pa", rotate = "none
 
 *Number of factor using scree plot for DVs*
 ```{r}
-scree(model_11_DVs)
+scree(model_11_DVs, main = "Scree plot for DVs")
 # roughly 2 factor 
 ```
 
 *Number of factor using scree plot for IVs*
 ```{r}
-scree(model_11_IVs)
+scree(model_11_IVs, main = "Scree Plot for IVs Items")
 # roughly 3 factors or 4 
 ```
 
 *Number of factor using parallel analysis for DVs*
 
 ```{r}
-fa.parallel(model_11_DVs)
+fa.parallel(model_11_DVs, main = "Parallel Analysis for DVs Items")
 # roughly 2 factor 
 ```
 
 *Number of factor using parallel analysis for IVs*
 
 ```{r}
-fa.parallel(model_11_IVs)
+fa.parallel(model_11_IVs, main = "Parallel Analysis for IVs Items")
 # suggested 4 to 5 factors  
 ```
 
 * Run Factor with determined factor number for *DVs *
+```{r}
+# with factor = 2
+set.seed(1245)
+model_11_DV_F2 <- psych::fa(model_11_DVs,nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
+```
+
+
 ```{r}
 # with factor = 3
 set.seed(1234)
@@ -232,12 +249,6 @@ model_11_DV_F3 <- psych::fa(model_11_DVs,nfactors = 3, fm = "pa", rotate = "obli
 psych::print.psych(model_11_DV_F3, cut = 0.3, sort=TRUE)
 ```
 
-```{r}
-# with factor = 2
-set.seed(1245)
-model_11_DV_F2 <- psych::fa(model_11_DVs,nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
-```
 
 ```{r}
 # with factor = 4
@@ -246,6 +257,10 @@ model_11_DV_F4 <- psych::fa(model_11_DVs,nfactors = 4, fm = "pa", rotate = "obli
 psych::print.psych(model_11_DV_F4, cut = 0.3, sort=TRUE)
 ```
 
+- *Note*
+ + with 5 factors, one item loaded on one factor
+ + with 6 factors, Heywood case was detected
+ + Best number ranged between 2 - 4
 
 * Run Factor with determined factor number for *IVs*
 ```{r}
@@ -253,6 +268,9 @@ psych::print.psych(model_11_DV_F4, cut = 0.3, sort=TRUE)
 set.seed(3233)
 model_11_IV_F6 <- psych::fa(model_11_IVs,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F6, cut = 0.3, sort=TRUE)
+
+names(model_11_IV_F6)
+mean(model_11_IV_F6$communality)
 ```
 
 ```{r}
