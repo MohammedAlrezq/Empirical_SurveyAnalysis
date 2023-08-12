@@ -75,6 +75,9 @@ model_11_IVs <- model_11 |>
 ```{r}
 library(vtable)# to print summary table 
 Model_11_stat <- describe(model_11)# fast = TRUE allow to compute only common stat summary, such as mean, SD, etc.
+
+library(here)
+png(filename = here("plot_folder", "Descriptive Statistic.png"), width = 2000, height = 2000, res = 300)
 model_11_sum.stat <- sumtable(model_11,
          summ = c('notNA(x)',
                   'mean(x)',
@@ -84,8 +87,10 @@ model_11_sum.stat <- sumtable(model_11,
                   'max(x)',
                   'skew(x)',
                   'kurtosi(x)'),
-         title = "Descriptive Statistic of variables/itmes")
+         title = "Descriptive Statistic of Variables/Items")
 model_11_sum.stat
+
+dev.off()
 #psych::describe(model_11, fast = TRUE)
 #
 ```
@@ -186,7 +191,7 @@ MSA_DVs <- ggplot(KMO_DVs, aes(x = reorder(Items, Value), y = Value)) +
 # Save plot 
 # library(here)# use to direct saving the plot in "plot_folder" and fucntion "here"
 library(here)
-ggsave(filename = here("plot_folder", "KMO_DVs.png"), plot = MSA_DVs)
+#ggsave(filename = here("plot_folder", "KMO_DVs.png"), plot = MSA_DVs)
 ```
 * *KMO for IVs* 
 ```{r}
@@ -216,7 +221,7 @@ MSA_IVs <- ggplot(KMO_IVs, aes(x = reorder(Items, Value), y = Value)) +
 # Save plot 
 # library(here)# use to direct saving the plot in "plot_folder" and fucntion "here"
 library(here)
-ggsave(filename = here("plot_folder", "KMO_IVs.png"), plot = MSA_IVs)
+#ggsave(filename = here("plot_folder", "KMO_IVs.png"), plot = MSA_IVs)
 
 ```
 
@@ -270,52 +275,52 @@ model_11_IV_F <- psych::fa(model_11_IVs,nfactors = 10, fm = "pa", rotate = "none
 # roughly 2 factor 
 
 # Set up the PNG device
-png(filename = here("plot_folder", "Scree plot for DVs.png"))
+#png(filename = here("plot_folder", "Scree plot for DVs.png"))
 
 # Plot
 scree(model_11_DVs, main = "Scree plot for Dependent Measured Items")
 
 # Turn off the device (this saves the plot)
-dev.off()
+#dev.off()
 
 ```
 
 *Number of factor using scree plot for IVs*
 ```{r}
 # Set up the PNG device
-png(filename = here("plot_folder", "Scree plot for IVs.png"))
+#png(filename = here("plot_folder", "Scree plot for IVs.png"))
 
 scree(model_11_IVs, main = "Scree Plot for Independent Measured Items")
 # roughly 3 factors or 4 
 
 # Turn off the device (this saves the plot)
-dev.off()
+#dev.off()
 ```
 
 *Number of factor using parallel analysis for DVs*
 
 ```{r}
 # Set up the PNG device
-png(filename = here("plot_folder", "Parallel Analysis for DVs.png"))
+#png(filename = here("plot_folder", "Parallel Analysis for DVs.png"))
 
 fa.parallel(model_11_DVs, main = "Parallel Analysis for Dependent Measured Items")
 # roughly 2 factor 
 
 # Turn off the device (this saves the plot)
-dev.off()
+#dev.off()
 ```
 
 *Number of factor using parallel analysis for IVs*
 
 ```{r}
 # Set up the PNG device
-png(filename = here("plot_folder", "Parallel Analysis for IVs.png"))
+#png(filename = here("plot_folder", "Parallel Analysis for IVs.png"))
 
 fa.parallel(model_11_IVs, main = "Parallel Analysis for Independent Measured Items")
 # suggested 4 to 5 factors  
 
 # Turn off the device (this saves the plot)
-dev.off()
+#dev.off()
 ```
 
 * Run Factor with determined factor number for *DVs *
@@ -324,6 +329,11 @@ dev.off()
 set.seed(1245)
 model_11_DV_F2 <- psych::fa(model_11_DVs,nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
+
+# Excluding CULT_INTG_5
+set.seed(12333)
+model_11_DV_2F_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_2F_CULT_INTG_5, cut = 0.3, sort=TRUE)
 ```
 
 
@@ -332,6 +342,23 @@ psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
 set.seed(1234)
 model_11_DV_F3 <- psych::fa(model_11_DVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_DV_F3, cut = 0.3, sort=TRUE)
+names(model_11_DVs)
+
+# Excluding CULT_INTG_5
+set.seed(12324)
+model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_CULT_INTG_5, cut = 0.3, sort=TRUE)
+
+# Excluding EMPL_BEL_10
+set.seed(11324)
+model_11_DV_EMPL_BEL_10 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_EMPL_BEL_10, cut = 0.3, sort=TRUE)
+
+# Excluding EMPL_BEL_10 and CULT_INTG_5
+set.seed(11114)
+model_11_DV_EMPL_BEL_10_CULT_INTG_5 <- psych::fa(model_11_DVs[, !names(model_11_DVs) %in% c("CULT_INTG_5", "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_EMPL_BEL_10_CULT_INTG_5, cut = 0.3, sort=TRUE)
+
 ```
 
 
