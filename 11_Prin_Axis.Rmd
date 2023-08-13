@@ -370,7 +370,7 @@ model_11_DV_F4 <- psych::fa(model_11_DVs,nfactors = 4, fm = "pa", rotate = "obli
 psych::print.psych(model_11_DV_F4, cut = 0.3, sort=TRUE)
 ```
 
-- *Note*
+- *Note for DVs*
  + with 5 factors, one item loaded on one factor
  + with 6 factors, Heywood case was detected
  + Best number ranged between 2 - 4
