@@ -1,0 +1,119 @@
+---
+title: "11_Prin_Axis_DVs"
+author: "Mohammed Alrezq"
+date: "2023-08-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Preliminary 
+### 1.1 Load libraires: this need to be 
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(psych)# use perform EFA
+library(purrr)
+library(ggplot2)
+library(gridExtra)# to arrnge plot per row and col
+library(corrr)
+```
+
+
+```{r,}
+plotTheme <- function() {
+  theme(
+    plot.title = element_text(size = 14, family = "sans", face = "plain", hjust = 0),
+    plot.subtitle=element_text(size = 11, family = "sans", hjust = 0),
+    plot.caption=element_text(size = 10, family = "sans", face = "italic", hjust = 0), 
+    axis.title.x = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = -0.5),
+    axis.title.y = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = 1),
+    axis.text = element_text(size = 9, family = "sans", face = "plain"),
+    panel.background = element_blank(),
+    panel.grid.minor = element_line(colour = "gray"),
+    panel.grid.major = element_line(colour = "gray"),
+    axis.ticks = element_blank(),
+    legend.title = element_text(size = 10, family = "sans"),
+    legend.text = element_text(size = 9, family = "sans"),
+    axis.line = element_blank()
+  )
+}
+```
+
+## 1.2 load data
+```{r}
+model_11 <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X from the data 
+model_11 <- model_11 |> 
+  select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+model_11 <- model_11 |> 
+  mutate_if(is.integer, as.numeric)
+```
+
+## 1.3 Split data to dependent and independet variables 
+```{r}
+# Dependent variables/items 
+model_11_DVs <- model_11 |> 
+  select(1:13)
+#str(model_11_DVs)
+# Independent variables/items 
+model_11_IVs <- model_11 |> 
+  select(14:42)
+#str(model_11_IVs)
+```
+
+* Run Factor with determined factor number for *DVs *
+```{r}
+# with factor = 2
+set.seed(1245)
+model_11_DV_F2 <- psych::fa(model_11_DVs,nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
+
+# Excluding CULT_INTG_5
+set.seed(12333)
+model_11_DV_2F_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_2F_CULT_INTG_5, cut = 0.3, sort=TRUE)
+```
+
+
+```{r}
+# with factor = 3
+set.seed(1234)
+model_11_DV_F3 <- psych::fa(model_11_DVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_F3, cut = 0.3, sort=TRUE)
+names(model_11_DVs)
+
+################Experimenting removing some items from DVs ###########################################
+# Excluding CULT_INTG_5
+set.seed(12324)
+model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_CULT_INTG_5, cut = 0.3, sort=TRUE)
+
+# Excluding EMPL_BEL_10
+set.seed(11324)
+model_11_DV_EMPL_BEL_10 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_EMPL_BEL_10, cut = 0.3, sort=TRUE)
+
+# Excluding EMPL_BEL_10 and CULT_INTG_5
+set.seed(11114)
+model_11_DV_EMPL_BEL_10_CULT_INTG_5 <- psych::fa(model_11_DVs[, !names(model_11_DVs) %in% c("CULT_INTG_5", "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_EMPL_BEL_10_CULT_INTG_5, cut = 0.3, sort=TRUE)
+
+```
+
+
+```{r}
+# with factor = 4
+set.seed(12454)
+model_11_DV_F4 <- psych::fa(model_11_DVs,nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_F4, cut = 0.3, sort=TRUE)
+```
+
+- *Note*
+ + with 5 factors, one item loaded on one factor
+ + with 6 factors, Heywood case was detected
+ + Best number ranged between 2 - 4
