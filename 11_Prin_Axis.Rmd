@@ -415,7 +415,36 @@ psych::print.psych(model_11_IV_F3, cut = 0.3, sort=TRUE)
 mean(model_11_IV_F3$communality)
 ```
 
+#### Principle Component analysis 
+- Determine number of factors using eigenvalues 
+```{r}
+# NO. of factor for DVs
+model_11_DVs_PCA <- psych::principal(model_11_DVs, nfactors = length(model_11_DVs), rotate = "none")
+# 2 Components > 1
+model_11_IVs_PCA <- psych::principal(model_11_IVs, nfactors = length(model_11_IVs), rotate = "none")
+# 7 Components > 1
 
+```
 
+- PCA for DVs 
+```{r}
+# No. of factors 2 
+set.seed(1114)
+model_11_DVs_2PCA <- psych::principal(model_11_DVs, nfactors = 2, rotate = "oblimin")
+psych::print.psych(model_11_DVs_2PCA, cut = 0.3, sort=TRUE)
+```
 
+- PCA for IVs
+```{r}
+# No. of factors 7 
+set.seed(1115)
+model_11_IVs_7PCA <- psych::principal(model_11_IVs, nfactors = 7, rotate = "oblimin")
+psych::print.psych(model_11_IVs_7PCA, cut = 0.3, sort=TRUE)
+
+# No. of factors 6
+set.seed(11156)
+model_11_IVs_6PCA <- psych::principal(model_11_IVs, nfactors = 6, rotate = "oblimin")
+psych::print.psych(model_11_IVs_6PCA, cut = 0.3, sort=TRUE)
+
+```
 
