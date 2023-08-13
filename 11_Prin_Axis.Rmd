@@ -323,57 +323,7 @@ fa.parallel(model_11_IVs, main = "Parallel Analysis for Independent Measured Ite
 #dev.off()
 ```
 
-* Run Factor with determined factor number for *DVs *
-```{r}
-# with factor = 2
-set.seed(1245)
-model_11_DV_F2 <- psych::fa(model_11_DVs,nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
 
-# Excluding CULT_INTG_5
-set.seed(12333)
-model_11_DV_2F_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_2F_CULT_INTG_5, cut = 0.3, sort=TRUE)
-```
-
-
-```{r}
-# with factor = 3
-set.seed(1234)
-model_11_DV_F3 <- psych::fa(model_11_DVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_F3, cut = 0.3, sort=TRUE)
-names(model_11_DVs)
-
-################Experimenting removing some items from DVs ###########################################
-# Excluding CULT_INTG_5
-set.seed(12324)
-model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_CULT_INTG_5, cut = 0.3, sort=TRUE)
-
-# Excluding EMPL_BEL_10
-set.seed(11324)
-model_11_DV_EMPL_BEL_10 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_EMPL_BEL_10, cut = 0.3, sort=TRUE)
-
-# Excluding EMPL_BEL_10 and CULT_INTG_5
-set.seed(11114)
-model_11_DV_EMPL_BEL_10_CULT_INTG_5 <- psych::fa(model_11_DVs[, !names(model_11_DVs) %in% c("CULT_INTG_5", "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_EMPL_BEL_10_CULT_INTG_5, cut = 0.3, sort=TRUE)
-
-```
-
-
-```{r}
-# with factor = 4
-set.seed(12454)
-model_11_DV_F4 <- psych::fa(model_11_DVs,nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_F4, cut = 0.3, sort=TRUE)
-```
-
-- *Note for DVs*
- + with 5 factors, one item loaded on one factor
- + with 6 factors, Heywood case was detected
- + Best number ranged between 2 - 4
 
 * Run Factor with determined factor number for *IVs*
 ```{r}
