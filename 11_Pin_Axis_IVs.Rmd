@@ -67,7 +67,7 @@ model_11_IVs <- model_11 |>
 ```
 
 
-* Run Factor with determined factor number for *IVs*
+# Number of factors is 6 factors
 ```{r}
 # with factor = 6
 set.seed(3233)
@@ -77,20 +77,22 @@ psych::print.psych(model_11_IV_F6, cut = 0.3, sort=TRUE)
 names(model_11_IV_F6)
 mean(model_11_IV_F6$communality)
 names(model_11_IVs)
+
+
 ################Experimenting removing some items from IVs with 6 factors ###########################################
 # remove EXT_CON_21
 set.seed(32433)
 model_11_IV_F6_EXT_CON_21 <- psych::fa(model_11_IVs[, -which(names(model_11_IVs) == "EXT_CON_21")],nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F6_EXT_CON_21, cut = 0.3, sort=TRUE)
 
-# remove EMP_ENG_12, INSTIT_17, EXT_CON_21, COM_KNW_23, GOAL_CL_25, GOAL_AL_27, TEAM_ST_29
+# remove EMP_ENG_12, INSTIT_17, EXT_CON_21, COM_KNW_23, GOAL_CL_25, GOAL_AL_27, TEAM_ST_29: these items has highest cross loading >0.75
 set.seed(32499)
 model_11_IV_F6_Delt_7items <- psych::fa(model_11_IVs
                                         [, !names(model_11_IVs) %in% c("EMP_ENG_12", "INSTIT_17", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")]
                                         ,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F6_Delt_7items, cut = 0.3, sort=TRUE)
 
-# remove "ORG_CUL_2", "EMP_ATT_3", TOOL_AP_13
+# remove "ORG_CUL_2", "EMP_ATT_3", TOOL_AP_13: these items also added to the above as they resutled with cross loading >0.75
 set.seed(32009)
 model_11_IV_F6_Delt_10items <- psych::fa(model_11_IVs
                                         [, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ATT_3" ,"EMP_ENG_12", "TOOL_AP_13" ,"INSTIT_17", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")]
@@ -98,6 +100,8 @@ model_11_IV_F6_Delt_10items <- psych::fa(model_11_IVs
 psych::print.psych(model_11_IV_F6_Delt_10items, cut = 0.3, sort=TRUE)
 ```
 
+
+# Number of factors is 5 factors
 ```{r}
 # with factor = 5
 set.seed(232333)
@@ -106,8 +110,20 @@ psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
 
 # Mean communality
 mean(model_11_IV_F5$communality)
+names(model_11_IVs)
+# Remove "ORG_CUL_2", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27"
+set.seed(00333)
+model_11_IV_F5_Delt_4itmes <- psych::fa(model_11_IVs 
+                                        [, !names(model_11_IVs) %in% c("ORG_CUL_2", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27")],
+                                        nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Delt_4itmes, cut = 0.3, sort=TRUE)
 ```
 
+
+
+
+
+# Number of factors is 4 factors
 ```{r}
 # with factor = 4
 set.seed(2322)
