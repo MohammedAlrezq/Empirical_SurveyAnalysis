@@ -1,0 +1,164 @@
+---
+title: "11_Pin_Axis_IVs"
+author: "Mohammed Alrezq"
+date: "2023-08-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1. Preliminary 
+### 1.1 Load libraires: this need to be 
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(psych)# use perform EFA
+library(purrr)
+library(ggplot2)
+library(gridExtra)# to arrnge plot per row and col
+library(corrr)
+```
+
+
+```{r,}
+plotTheme <- function() {
+  theme(
+    plot.title = element_text(size = 14, family = "sans", face = "plain", hjust = 0),
+    plot.subtitle=element_text(size = 11, family = "sans", hjust = 0),
+    plot.caption=element_text(size = 10, family = "sans", face = "italic", hjust = 0), 
+    axis.title.x = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = -0.5),
+    axis.title.y = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = 1),
+    axis.text = element_text(size = 9, family = "sans", face = "plain"),
+    panel.background = element_blank(),
+    panel.grid.minor = element_line(colour = "gray"),
+    panel.grid.major = element_line(colour = "gray"),
+    axis.ticks = element_blank(),
+    legend.title = element_text(size = 10, family = "sans"),
+    legend.text = element_text(size = 9, family = "sans"),
+    axis.line = element_blank()
+  )
+}
+```
+
+## 1.2 load data
+```{r}
+model_11 <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X from the data 
+model_11 <- model_11 |> 
+  select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+model_11 <- model_11 |> 
+  mutate_if(is.integer, as.numeric)
+```
+
+## 1.3 Split data to dependent and independet variables 
+```{r}
+# Dependent variables/items 
+model_11_DVs <- model_11 |> 
+  select(1:13)
+#str(model_11_DVs)
+# Independent variables/items 
+model_11_IVs <- model_11 |> 
+  select(14:42)
+#str(model_11_IVs)
+```
+
+
+* Run Factor with determined factor number for *IVs*
+```{r}
+# with factor = 6
+set.seed(3233)
+model_11_IV_F6 <- psych::fa(model_11_IVs,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F6, cut = 0.3, sort=TRUE)
+
+names(model_11_IV_F6)
+mean(model_11_IV_F6$communality)
+names(model_11_IVs)
+################Experimenting removing some items from IVs with 6 factors ###########################################
+# remove EXT_CON_21
+set.seed(32433)
+model_11_IV_F6_EXT_CON_21 <- psych::fa(model_11_IVs[, -which(names(model_11_IVs) == "EXT_CON_21")],nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F6_EXT_CON_21, cut = 0.3, sort=TRUE)
+
+# remove EMP_ENG_12, INSTIT_17, EXT_CON_21, COM_KNW_23, GOAL_CL_25, GOAL_AL_27, TEAM_ST_29
+set.seed(32499)
+model_11_IV_F6_Delt_7items <- psych::fa(model_11_IVs
+                                        [, !names(model_11_IVs) %in% c("EMP_ENG_12", "INSTIT_17", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")]
+                                        ,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F6_Delt_7items, cut = 0.3, sort=TRUE)
+
+# remove "ORG_CUL_2", "EMP_ATT_3", TOOL_AP_13
+set.seed(32009)
+model_11_IV_F6_Delt_10items <- psych::fa(model_11_IVs
+                                        [, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ATT_3" ,"EMP_ENG_12", "TOOL_AP_13" ,"INSTIT_17", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")]
+                                        ,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F6_Delt_10items, cut = 0.3, sort=TRUE)
+```
+
+```{r}
+# with factor = 5
+set.seed(232333)
+model_11_IV_F5 <- psych::fa(model_11_IVs,nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
+
+# Mean communality
+mean(model_11_IV_F5$communality)
+```
+
+```{r}
+# with factor = 4
+set.seed(2322)
+model_11_IV_F4 <- psych::fa(model_11_IVs,nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F4, cut = 0.3, sort=TRUE)
+
+# mean communality 
+mean(model_11_IV_F4$communality)
+```
+
+```{r}
+# with factor = 3
+set.seed(23225)
+model_11_IV_F3 <- psych::fa(model_11_IVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F3, cut = 0.3, sort=TRUE)
+
+# Mean communality 
+mean(model_11_IV_F3$communality)
+```
+
+#### Principle Component analysis 
+- Determine number of factors using eigenvalues 
+```{r}
+# NO. of factor for DVs
+model_11_DVs_PCA <- psych::principal(model_11_DVs, nfactors = length(model_11_DVs), rotate = "none")
+# 2 Components > 1
+model_11_IVs_PCA <- psych::principal(model_11_IVs, nfactors = length(model_11_IVs), rotate = "none")
+# 7 Components > 1
+
+```
+
+- PCA for DVs 
+```{r}
+# No. of factors 2 
+set.seed(1114)
+model_11_DVs_2PCA <- psych::principal(model_11_DVs, nfactors = 2, rotate = "oblimin")
+psych::print.psych(model_11_DVs_2PCA, cut = 0.3, sort=TRUE)
+```
+
+- PCA for IVs
+```{r}
+# No. of factors 7 
+set.seed(1115)
+model_11_IVs_7PCA <- psych::principal(model_11_IVs, nfactors = 7, rotate = "oblimin")
+psych::print.psych(model_11_IVs_7PCA, cut = 0.3, sort=TRUE)
+
+# No. of factors 6
+set.seed(11156)
+model_11_IVs_6PCA <- psych::principal(model_11_IVs, nfactors = 6, rotate = "oblimin")
+psych::print.psych(model_11_IVs_6PCA, cut = 0.3, sort=TRUE)
+
+```
+
+
