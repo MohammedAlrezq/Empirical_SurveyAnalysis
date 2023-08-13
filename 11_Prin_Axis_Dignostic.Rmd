@@ -325,7 +325,9 @@ fa.parallel(model_11_IVs, main = "Parallel Analysis for Independent Measured Ite
 
 * Number of factor using network 
 ```{r}
-EGAnet
+install.packages("EGAnet") 
+library(EGAnet)
+EGA(model_11_IVs, plot.EGA = TRUE, steps = 10)
 ```
 
 
