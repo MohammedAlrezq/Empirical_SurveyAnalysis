@@ -111,16 +111,29 @@ psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
 # Mean communality
 mean(model_11_IV_F5$communality)
 names(model_11_IVs)
+
 # Remove "ORG_CUL_2", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27"
 set.seed(00333)
 model_11_IV_F5_Delt_4itmes <- psych::fa(model_11_IVs 
                                         [, !names(model_11_IVs) %in% c("ORG_CUL_2", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27")],
                                         nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F5_Delt_4itmes, cut = 0.3, sort=TRUE)
+
+# Remove "ORG_CUL_2", EMP_ENG_12 , SCOPE_16, EXT_CON_21, "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", TEAM_ST_29, 
+set.seed(111123)
+model_11_IV_F5_Delt_8itmes <- psych::fa(model_11_IVs 
+                                        [, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ENG_12", "SCOPE_16", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")],
+                                        nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Delt_8itmes, cut = 0.3, sort=TRUE)
+
+
+# Remove "ORG_CUL_2", "EMP_ATT_3", EMP_ENG_12 , SCOPE_16, EXT_CON_21, "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", TEAM_ST_29, 
+set.seed(1111230)
+model_11_IV_F5_Delt_9itmes <- psych::fa(model_11_IVs 
+                                        [, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ATT_3", "EMP_ENG_12", "SCOPE_16", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")],
+                                        nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Delt_9itmes, cut = 0.3, sort=TRUE)
 ```
-
-
-
 
 
 # Number of factors is 4 factors
@@ -132,8 +145,23 @@ psych::print.psych(model_11_IV_F4, cut = 0.3, sort=TRUE)
 
 # mean communality 
 mean(model_11_IV_F4$communality)
+
+# Remove "ORG_CUL_2", "EMP_ATT_3", "LD_STL_9",  "SCOPE_16", "COM_KNW_23", "GOAL_CL_25", 
+set.seed(232200)
+model_11_IV_F4_delt_6items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ATT_3", "LD_STL_9",  "SCOPE_16", "COM_KNW_23", "GOAL_CL_25")],
+                                        nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F4_delt_6items, cut = 0.3, sort=TRUE)
+
+
+# Remove "ORG_CUL_2", "EMP_ATT_3", "LD_STL_9",  "SCOPE_16", "COM_KNW_23", "GOAL_CL_25", more remove: "LD_SUP_1", "RES_CHG_8", "EXT_CON_21"
+set.seed(232299)
+model_11_IV_F4_delt_9items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ATT_3", "LD_STL_9",  "SCOPE_16", "COM_KNW_23", "GOAL_CL_25", "LD_SUP_1", "RES_CHG_8", "EXT_CON_21")],
+                                        nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F4_delt_9items, cut = 0.3, sort=TRUE)
 ```
 
+
+# Number of factors is 3 factors
 ```{r}
 # with factor = 3
 set.seed(23225)
@@ -142,6 +170,18 @@ psych::print.psych(model_11_IV_F3, cut = 0.3, sort=TRUE)
 
 # Mean communality 
 mean(model_11_IV_F3$communality)
+# remove "EMP_ATT_3", RES_AVL_4", "RES_CHG_8", "EXP_CON_20", "EXT_CON_21", "COM_KNW_23"
+set.seed(23445)
+model_11_IV_F3_dlt_6items <- psych::fa(model_11_IVs [, !names(model_11_IVs) %in% c("EMP_ATT_3", "RES_AVL_4", "RES_CHG_8", "EXP_CON_20", "EXT_CON_21", "COM_KNW_23")],
+                                       nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F3_dlt_6items, cut = 0.3, sort=TRUE)
+
+
+# remove "EMP_ATT_3", RES_AVL_4", "RES_CHG_8", "EXP_CON_20", "EXT_CON_21", "COM_KNW_23". further remove: "SYS_COM_28", "UND_CNG_22"
+set.seed(2344511)
+model_11_IV_F3_dlt_8items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("EMP_ATT_3", "RES_AVL_4", "RES_CHG_8", "EXP_CON_20", "EXT_CON_21", "COM_KNW_23", "SYS_COM_28", "UND_CNG_22")],
+                                       nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F3_dlt_8items, cut = 0.3, sort=TRUE)
 ```
 
 #### Principle Component analysis 
