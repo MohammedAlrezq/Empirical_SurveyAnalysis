@@ -127,3 +127,35 @@ psych::print.psych(model_11_DV_F4, cut = 0.3, sort=TRUE)
  + with 5 factors, one item loaded on one factor
  + with 6 factors, Heywood case was detected
  + Best number ranged between 2 - 4
+ 
+ 
+ 
+## Principle Component analysis 
+- Determine number of factors using eigenvalues 
+```{r}
+# NO. of factor for DVs
+model_11_DVs_PCA <- psych::principal(model_11_DVs, nfactors = length(model_11_DVs), rotate = "none")
+# 2 Components > 1
+```
+
+##### PCA for DVs wiht 2 component
+```{r}
+# No. of factors 2 
+set.seed(1114)
+model_11_DVs_2PCA <- psych::principal(model_11_DVs, nfactors = 2, rotate = "oblimin")
+psych::print.psych(model_11_DVs_2PCA, cut = 0.3, sort=TRUE)
+```
+
+##### PCA for DVs wiht 3 component
+```{r}
+# No. of factors 3
+set.seed(11149)
+model_11_DVs_3PCA <- psych::principal(model_11_DVs, nfactors = 3, rotate = "oblimin")
+psych::print.psych(model_11_DVs_3PCA, cut = 0.3, sort=TRUE)
+
+
+# Remove CULT_INTG_5
+set.seed(111490)
+model_11_DVs_3PCA_dlt_1item <- psych::principal(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")], nfactors = 3, rotate = "oblimin")
+psych::print.psych(model_11_DVs_3PCA_dlt_1item, cut = 0.3, sort=TRUE)
+```

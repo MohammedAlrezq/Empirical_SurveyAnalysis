@@ -119,6 +119,19 @@ library(here)# use to direct saving the plot in "plot_folder" and fucntion "here
 
 #3
 dev.off()
+
+# DVs correlation for spearman 
+cor_matrix_DVs <- cor(model_11_DVs, method = "spearman")
+# Plotting the correlation matrix
+corrplot(cor_matrix_DVs, 
+         method = "number", 
+         #order = "hclust", # arranges the variables in a way that those with the highest similarities are closer to each other. 
+         tl.col = "black", 
+         #tl.srt = 45, 
+         addCoef.col = "black",
+         title = "Dependent Measured Items Correlation",
+         line = -1)
+
 ```
 ### 2.1 Correlation Matrix for Independent variables  
 ```{r}
@@ -138,6 +151,24 @@ corrplot(model_11_IV_corr,
          line = -2, # moves the title closer to the plot
          cex.main = 1.5) # adjusts the size of the title
 
+
+#3
+dev.off()
+
+# IVs correlation for spearman 
+cor_matrix_IVs <- cor(model_11_IVs, method = "spearman")
+# Plotting the correlation matrix
+png(filename = here("plot_folder", "IVs_Correlation matrix2.png"), width = 2000, height = 2000, res = 300)
+
+corrplot(cor_matrix_IVs, 
+         method = "number", 
+         #order = "hclust", # arranges the variables in a way that those with the highest similarities are closer to each other. 
+         tl.col = "black", 
+         number.cex = 0.6,
+         #tl.srt = 45, 
+         title = "Independent Measured Items Correlation",
+         line = -1,
+         cex.main = 1.5)
 
 #3
 dev.off()
