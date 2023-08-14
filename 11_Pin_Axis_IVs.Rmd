@@ -150,6 +150,22 @@ model_11_IV_F5_Delt_9itmes <- psych::fa(model_11_IVs
                                         [, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ATT_3", "EMP_ENG_12", "SCOPE_16", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")],
                                         nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F5_Delt_9itmes, cut = 0.3, sort=TRUE)
+
+
+# Remove "GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "RES_CHG_8" 
+set.seed(111123030)
+model_11_IV_F5_Delt_6itmes <- psych::fa(model_11_IVs 
+                                        [, !names(model_11_IVs) %in% c("GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "RES_CHG_8" )],
+                                        nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Delt_6itmes, cut = 0.3, sort=TRUE)
+
+# Remove "GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "RES_CHG_8". further remove: "EMP_ENG_12",  "SCOPE_16", "TEAM_ST_29", "SYS_COM_28", "ORG_CHR_10"
+set.seed(1111230300)
+model_11_IV_F5_Delt_10itmes <- psych::fa(model_11_IVs 
+                                        [, !names(model_11_IVs) %in% c("GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "RES_CHG_8", "EMP_ENG_12",  "SCOPE_16", "TEAM_ST_29", "SYS_COM_28", "ORG_CHR_10")],
+                                        nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Delt_10itmes, cut = 0.3, sort=TRUE)
+# Note: this setting lead to Heywood case. STOP here
 ```
 
 
