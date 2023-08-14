@@ -75,8 +75,8 @@ psych::print.psych(model_11_DV_F2, cut = 0.3, sort=TRUE)
 
 # Excluding CULT_INTG_5
 set.seed(12333)
-model_11_DV_2F_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
-psych::print.psych(model_11_DV_2F_CULT_INTG_5, cut = 0.3, sort=TRUE)
+model_11_DV_2F_delt_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 2, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_2F_delt_CULT_INTG_5, cut = 0.3, sort=TRUE)
 ```
 
 
@@ -92,6 +92,7 @@ names(model_11_DVs)
 set.seed(12324)
 model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_DV_CULT_INTG_5, cut = 0.3, sort=TRUE)
+# Note: this is best soltuion with 3 factros. crossloading <0.75, explained variance = 0.69, and item 10's commonality =0.38
 
 # Excluding EMPL_BEL_10
 set.seed(11324)
@@ -102,6 +103,15 @@ psych::print.psych(model_11_DV_EMPL_BEL_10, cut = 0.3, sort=TRUE)
 set.seed(11114)
 model_11_DV_EMPL_BEL_10_CULT_INTG_5 <- psych::fa(model_11_DVs[, !names(model_11_DVs) %in% c("CULT_INTG_5", "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_DV_EMPL_BEL_10_CULT_INTG_5, cut = 0.3, sort=TRUE)
+
+
+
+# Excluding EMPL_BEL_10 and CULT_INTG_5. further remove "ACT_INTG_7"
+names(model_11_DVs)
+set.seed(10014)
+model_11_DV_delt_3items <- psych::fa(model_11_DVs[, !names(model_11_DVs) %in% c("CULT_INTG_5", "EMPL_BEL_10", "ACT_INTG_7")],
+                                                 nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_DV_delt_3items, cut = 0.3, sort=TRUE)
 
 ```
 

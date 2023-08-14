@@ -85,7 +85,7 @@ set.seed(32433)
 model_11_IV_F6_EXT_CON_21 <- psych::fa(model_11_IVs[, -which(names(model_11_IVs) == "EXT_CON_21")],nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F6_EXT_CON_21, cut = 0.3, sort=TRUE)
 
-# remove EMP_ENG_12, INSTIT_17, EXT_CON_21, COM_KNW_23, GOAL_CL_25, GOAL_AL_27, TEAM_ST_29: these items has highest cross loading >0.75
+# remove EMP_ENG_12, INSTIT_17, "EXT_CON_21", COM_KNW_23, GOAL_CL_25, "GOAL_AL_27", TEAM_ST_29: these items has highest cross loading >0.75
 set.seed(32499)
 model_11_IV_F6_Delt_7items <- psych::fa(model_11_IVs
                                         [, !names(model_11_IVs) %in% c("EMP_ENG_12", "INSTIT_17", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")]
@@ -98,6 +98,23 @@ model_11_IV_F6_Delt_10items <- psych::fa(model_11_IVs
                                         [, !names(model_11_IVs) %in% c("ORG_CUL_2", "EMP_ATT_3" ,"EMP_ENG_12", "TOOL_AP_13" ,"INSTIT_17", "EXT_CON_21", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "TEAM_ST_29")]
                                         ,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F6_Delt_10items, cut = 0.3, sort=TRUE)
+
+# Remove "RES_CHG_8", "TEAM_ST_29", "INSTIT_17", "GOAL_CL_25", "GOAL_AL_27", "COM_KNW_23", "EMP_ENG_12", "RES_CHG_8", "EXT_CON_21"
+names(model_11_IVs)
+set.seed(000012)
+model_11_IV_F6_Delt_9items <- psych::fa(model_11_IVs
+                                        [, !names(model_11_IVs) %in% c("RES_CHG_8", "TEAM_ST_29", "INSTIT_17", "GOAL_CL_25", "GOAL_AL_27", "COM_KNW_23", "EMP_ENG_12", "RES_CHG_8", "EXT_CON_21")]
+                                        ,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F6_Delt_9items, cut = 0.3, sort=TRUE)
+# Note: the resutls have many cross loading and possibility of having a factor with 1 item
+
+# Remove "RES_CHG_8", "TEAM_ST_29", "INSTIT_17", "GOAL_CL_25", "GOAL_AL_27", "COM_KNW_23", "EMP_ENG_12"
+names(model_11_IVs)
+set.seed(0000129)
+model_11_IV_F6_Delt_7items <- psych::fa(model_11_IVs
+                                        [, !names(model_11_IVs) %in% c("RES_CHG_8", "TEAM_ST_29", "INSTIT_17", "GOAL_CL_25", "GOAL_AL_27", "COM_KNW_23", "EMP_ENG_12")]
+                                        ,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F6_Delt_7items, cut = 0.3, sort=TRUE)
 ```
 
 
