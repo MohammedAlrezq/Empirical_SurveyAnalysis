@@ -194,6 +194,9 @@ psych::print.psych(model_11_IV_F5_Promax, cut = 0.3, sort=TRUE)
 install.packages("EFAtools")
 library(EFAtools)
 EFA_VDs <- EFAtools::EFA(model_11_IVs, n_factors = 6, method = "PAF", rotation = "oblimin", normalize = FALSE )
+
+
+
 ```
 
 
