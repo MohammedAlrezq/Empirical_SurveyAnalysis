@@ -166,7 +166,31 @@ model_11_IV_F5_Delt_10itmes <- psych::fa(model_11_IVs
                                         nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F5_Delt_10itmes, cut = 0.3, sort=TRUE)
 # Note: this setting lead to Heywood case. STOP here
+
+# Remove "GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23"
+set.seed(0001)
+model_11_IV_F5_Delt_4itmes2 <- psych::fa(model_11_IVs 
+                                        [, !names(model_11_IVs) %in% c("GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23")],
+                                        nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Delt_4itmes2, cut = 0.3, sort=TRUE)
+
+# Remove "GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23". further remove: "SCOPE_16", "EXT_CON_21", "TEAM_ST_29", "EMP_ENG_12"
+set.seed(000121)
+model_11_IV_F5_Delt_8itmes2 <- psych::fa(model_11_IVs 
+                                        [, !names(model_11_IVs) %in% c("GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23", "SCOPE_16", "EXT_CON_21", "TEAM_ST_29", "EMP_ENG_12")],
+                                        nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Delt_8itmes2, cut = 0.3, sort=TRUE)
 ```
+
+# Number of factors is 5 factors. Uisng Oblique "cluster"
+```{r}
+# with factor = 5
+set.seed(2323300)
+model_11_IV_F5_Promax <- psych::fa(model_11_IVs[, -which(names(model_11_IVs) == "SCOPE_16")],nfactors = 5, fm = "pa", rotate = "cluster", max.iter = 100)
+psych::print.psych(model_11_IV_F5_Promax, cut = 0.3, sort=TRUE)
+# this solution may mak4e sense but need to kknow the cluster method 
+```
+
 
 
 # Number of factors is 4 factors
