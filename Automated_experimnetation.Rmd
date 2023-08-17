@@ -486,3 +486,101 @@ if (!is.null(best_solution)) {
 
 ```
 
+
+
+```{r}
+# Function to run PAF with oblimin rotation excluding one item at a time
+runPAF <- function(data, item_to_exclude) {
+  # Drop the item
+  data_sub <- data[, !(names(data) %in% item_to_exclude)]
+  
+  # Run PAF
+  factor_model <- fa(r = data_sub, nfactors = 6, fm = "pa", rotate = "oblimin")
+  
+  # Remove loadings <= 0.30
+  factor_model$loadings[factor_model$loadings <= 0.30] <- 0
+  
+  return(factor_model)
+}
+
+# Loop through all items and run the PAF excluding each one
+results_list <- list()
+for (item in colnames(data)) {
+  results_list[[item]] <- runPAF(data, item)
+  
+  # Print results for review
+  print(paste("Model excluding item:", item))
+  print(results_list[[item]])
+}
+
+# Now, results_list contains the PAF results for each of the 29 runs, each excluding a different item.
+
+```
+
+```{r}
+# Assuming you have already loaded your dataset 'model_11_IVs' and the psych package
+
+# Function to run PAF with oblimin rotation excluding one item at a time
+runPAF <- function(data, item_to_exclude) {
+  # Drop the item
+  data_sub <- data[, !(names(data) %in% item_to_exclude)]
+  
+  # Run PAF
+  factor_model <- fa(r = data_sub, nfactors = 6, fm = "pa", rotate = "oblimin")
+  
+  # Find columns where the maximum absolute value of loadings is <= 0.30
+  col_to_exclude <- apply(abs(factor_model$loadings), 2, max) <= 0.30
+  
+  # Omit those columns
+  factor_model$loadings <- factor_model$loadings[, !col_to_exclude]
+  
+  return(factor_model)
+}
+
+# Loop through all items and run the PAF excluding each one
+results_list <- list()
+for (item in colnames(model_11_IVs)) {
+  results_list[[item]] <- runPAF(model_11_IVs, item)
+  
+  # Print results for review
+  print(paste("Model excluding item:", item))
+  print(results_list[[item]])
+}
+
+# Now, results_list contains the PAF results for each of the 29 runs, each excluding a different item.
+
+```
+
+
+
+```{r}
+runPAF <- function(data, item_to_exclude) {
+   # Drop the item
+   data_sub <- data[, !(names(data) %in% item_to_exclude)]
+   
+   # Run PAF
+   factor_model <- fa(r = data_sub, nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
+   
+   return(factor_model)
+}
+
+# Loop through all items and run the PAF excluding each one
+results_list <- list()
+for (item in colnames(model_11_IVs)) {
+   results_list[[item]] <- runPAF(model_11_IVs, item)
+   
+   # Print results for review
+   cat(paste("\nModel excluding item:", item, "\n"))
+   psych::print.psych(results_list[[item]], cut = 0.3, sort = TRUE)
+}
+
+, "", "UND_CNG_22", "EMP_ENG_12", "SCOPE_16"
+```
+
+```{r}
+set.seed(0000004)
+model_11_IV_test1 <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2", "GOAL_CL_25", "GOAL_AL_27", "UND_CNG_22", "EMP_ENG_12", "SCOPE_16")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_test1, cut = 0.3, sort=TRUE)
+
+```
+

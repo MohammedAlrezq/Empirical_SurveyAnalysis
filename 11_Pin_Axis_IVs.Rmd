@@ -115,6 +115,32 @@ model_11_IV_F6_Delt_7items <- psych::fa(model_11_IVs
                                         [, !names(model_11_IVs) %in% c("RES_CHG_8", "TEAM_ST_29", "INSTIT_17", "GOAL_CL_25", "GOAL_AL_27", "COM_KNW_23", "EMP_ENG_12")]
                                         ,nfactors = 6, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F6_Delt_7items, cut = 0.3, sort=TRUE)
+
+
+# 6 Factors using promax and Promax
+set.seed(32330)
+model_11_IV_promx_F6 <- psych::fa(model_11_IVs,nfactors = 6, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_promx_F6, cut = 0.3, sort=TRUE)
+
+#Remove "EMP_ENG_12", "INSTIT_17", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27"
+set.seed(323399)
+model_11_IV_promx_F6_delt_5items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("EMP_ENG_12", "INSTIT_17", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27")],nfactors = 6, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_promx_F6_delt_5items, cut = 0.3, sort=TRUE)
+
+#Remove "EMP_ENG_12", "INSTIT_17", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27". further remove: "ORG_CUL_2", "RES_CHG_8", "EFT_REQ_15"
+set.seed(3233990)
+model_11_IV_promx_F6_delt_8items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("EMP_ENG_12", "INSTIT_17", "COM_KNW_23", "GOAL_CL_25", "GOAL_AL_27", "ORG_CUL_2", "RES_CHG_8", "EFT_REQ_15")],nfactors = 6, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_promx_F6_delt_8items, cut = 0.3, sort=TRUE)
+# stop here some factors have 1 item only 
+
+
+####Delete 1 item at a time###################
+####"EMP_ENG_12", "COM_KNW_23", "TEAM_ST_29", "INSTIT_17", "GOAL_CL_25", "GOAL_AL_27"
+####[, !names(model_11_IVs) %in% c("EMP_ENG_12", "COM_KNW_23", "TEAM_ST_29", "INSTIT_17", "GOAL_CL_25", "GOAL_AL_27")]
+names(model_11_IVs)
+set.seed(444021)
+model_11_IV_F6_delt_2item <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("EMP_ENG_12", "GOAL_CL_25")],nfactors = 6, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F6_delt_2item, cut = 0.3, sort=TRUE)
 ```
 
 
@@ -180,6 +206,11 @@ model_11_IV_F5_Delt_8itmes2 <- psych::fa(model_11_IVs
                                         [, !names(model_11_IVs) %in% c("GOAL_AL_27", "ORG_CUL_2", "GOAL_CL_25", "COM_KNW_23", "SCOPE_16", "EXT_CON_21", "TEAM_ST_29", "EMP_ENG_12")],
                                         nfactors = 5, fm = "pa", rotate = "oblimin", max.iter = 100)
 psych::print.psych(model_11_IV_F5_Delt_8itmes2, cut = 0.3, sort=TRUE)
+
+# 5 Factors using promax and Promax
+set.seed(55502)
+model_11_IV_F5_promx <- psych::fa(model_11_IVs,nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5_promx, cut = 0.3, sort=TRUE)
 ```
 
 # Number of factors is 5 factors. Uisng Oblique "cluster" and another package 
@@ -195,7 +226,7 @@ install.packages("EFAtools")
 library(EFAtools)
 EFA_VDs <- EFAtools::EFA(model_11_IVs, n_factors = 6, method = "PAF", rotation = "oblimin", normalize = FALSE )
 
-
+Nfactro <- N_FACTORS(model_11_IVs, criteria = c("CD", "EKC", "HULL", "KGC", "PARALLEL", "SCREE", "SMT"), method = "PAF", N_samples = 67)
 
 ```
 

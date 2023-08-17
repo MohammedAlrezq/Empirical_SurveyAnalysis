@@ -185,6 +185,10 @@ model_11_DVs_Norm <- mardia(model_11_DVs, plot = TRUE)
 # IV <- mvn(model_11_IVs, mvnTest = "mardia")
 ```
 
+#### Normaliyt check for Independent variabels 
+```{r}
+model_11_IVs_Norm <- mardia(model_11_IVs, plot = TRUE)
+```
 
 
 #### A.Kaiser-Meyer-Olkin index (KMO)
@@ -359,6 +363,12 @@ fa.parallel(model_11_IVs, main = "Parallel Analysis for Independent Measured Ite
 install.packages("EGAnet") 
 library(EGAnet)
 EGA(model_11_IVs, plot.EGA = TRUE, steps = 10)
+```
+
+*Number of factor using VSS "very simple structure" for IVs*
+```{r}
+vss_model_11_IVs <- psych::VSS(model_11_IVs, n =  10, rotate = "oblimin", fm = "pa", plot=TRUE)
+
 ```
 
 
