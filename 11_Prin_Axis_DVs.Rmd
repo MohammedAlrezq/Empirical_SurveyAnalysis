@@ -90,7 +90,7 @@ names(model_11_DVs)
 ################Experimenting removing some items from DVs ###########################################
 # Excluding CULT_INTG_5
 set.seed(12324)
-model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "promax", max.iter = 100)
 psych::print.psych(model_11_DV_CULT_INTG_5, cut = 0.3, sort=TRUE)
 # Note: this is best soltuion with 3 factros. crossloading <0.75, explained variance = 0.69, and item 10's commonality =0.38
 mean(model_11_DV_CULT_INTG_5$communality)
@@ -159,3 +159,17 @@ set.seed(111490)
 model_11_DVs_3PCA_dlt_1item <- psych::principal(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")], nfactors = 3, rotate = "oblimin")
 psych::print.psych(model_11_DVs_3PCA_dlt_1item, cut = 0.3, sort=TRUE)
 ```
+
+
+Check Cronbach’s Alpha 
+```{r}
+# three latent factors for DVs based on this model:model_11_DV_CULT_INTG_5
+names(model_11_DVs)
+latent_factor_1 <- alpha(model_11_DVs[,c(1,4,8:13)]) # 0.94
+
+latent_factor_2 <- alpha(model_11_DVs[,2:3]) # 0.82
+
+latent_factor_3 <- alpha(model_11_DVs[,6:7]) # 0.82
+
+```
+

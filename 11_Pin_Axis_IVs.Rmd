@@ -265,8 +265,9 @@ psych::print.psych(model_11_IV_F4_delt_7items, cut = 0.3, sort=TRUE)
 #Remove "ORG_CUL_2", "LD_STL_9", "SCOPE_16", "COM_KNW_23", "GOAL_CL_25", "EXT_CON_21", "RES_CHG_8". further remove: LD_SUP_1
 set.seed(23400454)
 model_11_IV_F4_delt_8items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2", "LD_STL_9", "SCOPE_16", "COM_KNW_23", "GOAL_CL_25", "EXT_CON_21", "RES_CHG_8", "LD_SUP_1")],
-                                        nfactors = 4, fm = "pa", rotate = "oblimin", max.iter = 100)
+                                        nfactors = 4, fm = "pa", rotate = "promax", max.iter = 100)
 psych::print.psych(model_11_IV_F4_delt_8items, cut = 0.3, sort=TRUE)
+mean(model_11_IV_F4_delt_8items$communality)
 
 # Remove "ORG_CUL_2", "LD_STL_9", "SCOPE_16", "COM_KNW_23", "GOAL_CL_25", "EXT_CON_21", "RES_CHG_8". further remove: LD_SUP_1. further remove "EMP_ENG_12", "GOAL_AL_27"
 set.seed(00454)
@@ -369,4 +370,20 @@ set.seed(111002)
 model_11_IVs_4PCA_delt5items <- psych::principal(model_11_IVs[, !names(model_11_IVs) %in% c("SCOPE_16", "LD_STL_9", "ORG_CUL_2", "EMP_ATT_3", "GOAL_CL_25", "LD_SUP_1")], nfactors = 4, rotate = "oblimin")
 psych::print.psych(model_11_IVs_4PCA_delt5items, cut = 0.3, sort=TRUE)
 # Note: this might be good soltuion
+```
+
+
+Check Cronbach’s Alpha 
+```{r}
+# three latent factors for IVs based on this model:model_11_DV_CULT_INTG_5
+names(model_11_IVs)
+latent_factor_1 <- alpha(model_11_IVs[,c(12:15,20,26:27, 29)]) # 0.91
+
+latent_factor_2 <- alpha(model_11_IVs[,c(4, 17:19,24,28)]) # 0.87      
+
+latent_factor_3 <- alpha(model_11_IVs[,c(5:7, 10:11)]) # 0.88    
+
+latent_factor_4 <- alpha(model_11_IVs[,c(3, 22)]) # 0.87      
+
+
 ```
