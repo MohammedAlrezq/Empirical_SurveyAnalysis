@@ -13,8 +13,11 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# 1. Preliminary 
-### 1.1 Load libraires: this need to be 
+
+# 1. Preliminary
+
+### 1.1 Load libraires: this need to be
+
 ```{r, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(psych)# use perform EFA
@@ -46,6 +49,7 @@ plotTheme <- function() {
 ```
 
 ## 1.2 load data
+
 ```{r}
 model_11 <- read.csv("mean_data.csv")
 
@@ -58,7 +62,8 @@ model_11 <- model_11 |>
   mutate_if(is.integer, as.numeric)
 ```
 
-## 1.3 Split data to dependent and independet variables 
+## 1.3 Split data to dependent and independet variables
+
 ```{r}
 # Dependent variables/items 
 model_11_DVs <- model_11 |> 
@@ -71,12 +76,14 @@ model_11_IVs <- model_11 |>
 ```
 
 # 2 Statistical descriptive
-## 2.1 Statistical summary for all variables/itmes 
+
+## 2.1 Statistical summary for all variables/itmes
+
 ```{r}
 library(vtable)# to print summary table 
-Model_11_stat <- describe(model_11)# fast = TRUE allow to compute only common stat summary, such as mean, SD, etc.
-
-library(here)
+Model_11_stat <- round(describe(model_11), 2)# fast = TRUE allow to compute only common stat summary, such as mean, SD, etc.
+write.csv(Model_11_stat, "summary_statistic.csv")
+#library(here)
 png(filename = here("plot_folder", "Descriptive Statistic.png"), width = 2000, height = 2000, res = 300)
 model_11_sum.stat <- sumtable(model_11,
          summ = c('notNA(x)',
@@ -95,8 +102,10 @@ dev.off()
 #
 ```
 
-## 2 Principle Axis factoring 
-### 2.1 Correlation Matrix for Dependent variabels  
+## 2 Principle Axis factoring
+
+### 2.1 Correlation Matrix for Dependent variabels
+
 ```{r}
 model_11_DV_corr <- round(cor(model_11_DVs), 2) # Correlation matrix
 
@@ -121,7 +130,8 @@ library(here)# use to direct saving the plot in "plot_folder" and fucntion "here
 dev.off()
 
 # DVs correlation for spearman 
-cor_matrix_DVs <- cor(model_11_DVs, method = "spearman")
+cor_matrix_DVs <- round(cor(model_11_DVs, method = "spearman"), 2)
+write.csv(cor_matrix_DVs, "DVs_correlation_Sperman.csv")
 # Plotting the correlation matrix
 corrplot(cor_matrix_DVs, 
          method = "number", 
@@ -133,7 +143,9 @@ corrplot(cor_matrix_DVs,
          line = -1)
 
 ```
-### 2.1 Correlation Matrix for Independent variables  
+
+### 2.1 Correlation Matrix for Independent variables
+
 ```{r}
 model_11_IV_corr <- round(cor(model_11_IVs), 2) # Correlation matrix
 #write.csv(model_11_IV_corr, "IVs_correlation_matrix.csv")
@@ -174,31 +186,89 @@ corrplot(cor_matrix_IVs,
 dev.off()
 ```
 
-### 2.2 Diagnostic Test 
-#### Normaliyt check for dependent variabels 
+### 2.2 Diagnostic Test
+
+#### Normaliyt check for dependent variabels
+
 ```{r}
 # install.packages("MVN")
 # library(MVN)
 model_11_DVs_Norm <- mardia(model_11_DVs, plot = TRUE)
-# 
+
 # mvn(model_11_DVs, mvnTest = "mardia")
 # IV <- mvn(model_11_IVs, mvnTest = "mardia")
+# 
+
+
+#Kolmogorov-Smirnov (K-S) 
+DVs_norm <- ks.test(model_11_DVs, "pnorm", exact = FALSE)
+
+#---------Multivariate Normality check fro DVs------------------------
+#The below is to compute normality check using Kolmogorov-Smirnov (K-S) (with Lilliefors correction) 
+install.packages("nortest")   # For the lillie.test function
+library(nortest)
+
+# Assuming each column of survey_data contains a survey measured item
+# Replace "survey_data" with the actual name of your data frame
+for (col in colnames(model_11_DVs)) {
+  result <- lillie.test(model_11_DVs[[col]])
+  cat("Item:", col, "\n")
+  cat("p-value:", result$p.value, "\n")
+  if (result$p.value < 0.05) {
+    cat("The data does not follow a normal distribution.\n")
+  } else {
+    cat("The data follows a normal distribution.\n")
+  }
+  cat("\n")
+}
+
 ```
 
-#### Normaliyt check for Independent variabels 
+#### Normaliyt check for Independent variabels
+
 ```{r}
 model_11_IVs_Norm <- mardia(model_11_IVs, plot = TRUE)
-```
 
+
+#Kolmogorov-Smirnov (K-S) 
+IVs_norm <- ks.test(model_11_IVs, "pnorm", exact = FALSE)
+
+
+#---------Multivariate Normality check for IVs------------------------
+#The below is to compute normality check using Kolmogorov-Smirnov (K-S) (with Lilliefors correction) 
+#install.packages("nortest")   # For the lillie.test function
+library(nortest)
+
+# Assuming each column of survey_data contains a survey measured item
+# Replace "survey_data" with the actual name of your data frame
+for (col in colnames(model_11_IVs)) {
+  result <- lillie.test(model_11_IVs[[col]])
+  cat("Item:", col, "\n")
+  cat("p-value:", result$p.value, "\n")
+  if (result$p.value < 0.05) {
+    cat("The data does not follow a normal distribution.\n")
+  } else {
+    cat("The data follows a normal distribution.\n")
+  }
+  cat("\n")
+}
+
+ks.test(model_11_IVs$LD_SUP_1, "pnorm")# for single variabel works
+
+install.packages("nortest")
+model_11_IVs <- as.numeric(model_11_IVs)
+library(nortest)
+ad.test(model_11_IVs)
+```
 
 #### A.Kaiser-Meyer-Olkin index (KMO)
 
-* *KMO for DVs *
-**Kaiser’s 1974 recommendations were:**
-- bare minimum of .5
-- values between .5 and .7 as mediocre
-- values between .7 and .8 as good
-- values above .9 are superb
+-   *KMO for DVs* **Kaiser's 1974 recommendations were:**
+-   bare minimum of .5
+-   values between .5 and .7 as mediocre
+-   values between .7 and .8 as good
+-   values above .9 are superb
+
 ```{r}
 KMO(model_11_DVs)
 
@@ -228,7 +298,9 @@ MSA_DVs <- ggplot(KMO_DVs, aes(x = reorder(Items, Value), y = Value)) +
 library(here)
 #ggsave(filename = here("plot_folder", "KMO_DVs.png"), plot = MSA_DVs)
 ```
-* *KMO for IVs* 
+
+-   *KMO for IVs*
+
 ```{r}
 KMO(model_11_IVs)
 
@@ -260,51 +332,60 @@ library(here)
 
 ```
 
-#### B.Bartlett’s test
-* *Barlett’s for DVs* 
-* A significant Barlett’s ($p < 0.05$) tells that the $R$-matrix is not an identity matrix. That is, there are some relationships between variables that can be analyzed
-* The result of $p-value = 0.7.08*10^94$
+#### B.Bartlett's test
+
+-   *Barlett's for DVs*
+-   A significant Barlett's ($p < 0.05$) tells that the $R$-matrix is not an identity matrix. That is, there are some relationships between variables that can be analyzed
+-   The result of $p-value = 0.7.08*10^94$
 
 ```{r}
 psych::cortest.bartlett(model_11_DVs)
 ```
-* *Barlett’s for IVs* 
-* The result of $p-value = 0.7.08*10^94$
+
+-   *Barlett's for IVs*
+-   The result of $p-value = 0.7.08*10^94$
 
 ```{r}
 psych::cortest.bartlett(model_11_IVs)
 ```
 
 #### C. Multicollinearity or singularity in my data
-* *Multicollinearity for DVs*
-* Determinant of the correlation matrix
-- Det. of the correlation matrix should be greater than 0.00001
-- The result of deteriminant is $1.802578e-05$
+
+-   *Multicollinearity for DVs*
+-   Determinant of the correlation matrix
+-   Det. of the correlation matrix should be greater than 0.00001
+-   The result of deteriminant is $1.802578e-05$
+
 ```{r}
 det(cor(model_11_DVs))
 ```
-* *Multicollinearity for IVs*
+
+-   *Multicollinearity for IVs*
+
 ```{r}
 det(cor(model_11_IVs))
 ```
-- Note there might be multicollinearity with DVs (2.815678e-12) < 0.00001
 
-### Principle Axis Factoring 
+-   Note there might be multicollinearity with DVs (2.815678e-12) \< 0.00001
 
-* Determine number of factor for DVs 
-*Number of factor using with no rotation*
+### Principle Axis Factoring
+
+-   Determine number of factor for DVs *Number of factor using with no rotation*
+
 ```{r}
 model_11_DV_F <- psych::fa(model_11_DVs,nfactors = 7, fm = "pa", rotate = "none", max.iter = 100)
 # no. of factor > 1.0 or 0.77 is 2 factor 
 ```
-* Determine number of factor for IVs 
-*Number of factor using with no rotation*
+
+-   Determine number of factor for IVs *Number of factor using with no rotation*
+
 ```{r}
 model_11_IV_F <- psych::fa(model_11_IVs,nfactors = 10, fm = "pa", rotate = "none", max.iter = 100)
 # no. of factor > 1.0 or 0.77 is 5 factor and the 6th factor is 0.76
 ```
 
 *Number of factor using scree plot for DVs*
+
 ```{r}
 #scree(model_11_DVs, main = "Scree plot for DVs")
 # roughly 2 factor 
@@ -321,6 +402,7 @@ scree(model_11_DVs, main = "Scree plot for Dependent Measured Items")
 ```
 
 *Number of factor using scree plot for IVs*
+
 ```{r}
 # Set up the PNG device
 #png(filename = here("plot_folder", "Scree plot for IVs.png"))
@@ -358,7 +440,8 @@ fa.parallel(model_11_IVs, main = "Parallel Analysis for Independent Measured Ite
 #dev.off()
 ```
 
-* Number of factor using network 
+-   Number of factor using network
+
 ```{r}
 install.packages("EGAnet") 
 library(EGAnet)
@@ -366,9 +449,8 @@ EGA(model_11_IVs, plot.EGA = TRUE, steps = 10)
 ```
 
 *Number of factor using VSS "very simple structure" for IVs*
+
 ```{r}
 vss_model_11_IVs <- psych::VSS(model_11_IVs, n =  10, rotate = "oblimin", fm = "pa", plot=TRUE)
 
 ```
-
-
