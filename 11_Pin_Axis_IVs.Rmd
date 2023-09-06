@@ -211,6 +211,17 @@ psych::print.psych(model_11_IV_F5_Delt_8itmes2, cut = 0.3, sort=TRUE)
 set.seed(55502)
 model_11_IV_F5_promx <- psych::fa(model_11_IVs,nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
 psych::print.psych(model_11_IV_F5_promx, cut = 0.3, sort=TRUE)
+
+# Best soltuion with 5 factors using promax 
+set.seed(232333)
+model_11_IV_F5_9items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2","INSTIT_17", "SCOPE_16", "GOAL_AL_27", "TEAM_ST_29", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "ORG_CHR_10")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
+
+mean(model_11_IV_F5$communality)
+str(model_11_IV_F5_9items)
+
+structure_matx <- model_11_IV_F5_9items$Structure
+
 ```
 
 # Number of factors is 5 factors. Uisng Oblique "cluster" and another package 
