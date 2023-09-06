@@ -92,8 +92,17 @@ names(model_11_DVs)
 set.seed(12324)
 model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "promax", max.iter = 100)
 psych::print.psych(model_11_DV_CULT_INTG_5, cut = 0.3, sort=TRUE)
+psych::print.psych(model_11_DV_CULT_INTG_5, sort = TRUE) # print loading w/o supressed low loadings 
 # Note: this is best soltuion with 3 factros. crossloading <0.75, explained variance = 0.69, and item 10's commonality =0.38
 mean(model_11_DV_CULT_INTG_5$communality)
+
+# To download factor loading and communality for DVS
+DV_loading <- model_11_DV_CULT_INTG_5$loadings
+DV_communality <- model_11_DV_CULT_INTG_5$communality
+
+DV_combined_loading_communality <- cbind(DV_loading, Communalities = DV_communality)
+#write.csv(DV_combined_loading_communality, "DV_factor_loading.csv", row.names = TRUE)
+
 # Excluding EMPL_BEL_10
 set.seed(11324)
 model_11_DV_EMPL_BEL_10 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "EMPL_BEL_10")],nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
