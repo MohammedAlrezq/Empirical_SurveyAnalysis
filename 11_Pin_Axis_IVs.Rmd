@@ -215,9 +215,9 @@ psych::print.psych(model_11_IV_F5_promx, cut = 0.3, sort=TRUE)
 # Best soltuion with 5 factors using promax 
 set.seed(232333)
 model_11_IV_F5_9items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2","INSTIT_17", "SCOPE_16", "GOAL_AL_27", "TEAM_ST_29", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "ORG_CHR_10")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
-psych::print.psych(model_11_IV_F5, cut = 0.3, sort=TRUE)
+psych::print.psych(model_11_IV_F5_9items, sort=TRUE)
 
-mean(model_11_IV_F5$communality)
+mean(model_11_IV_F5_9items$communality)
 str(model_11_IV_F5_9items)
 
 structure_matx <- model_11_IV_F5_9items$Structure
@@ -386,7 +386,7 @@ psych::print.psych(model_11_IVs_4PCA_delt5items, cut = 0.3, sort=TRUE)
 ```
 
 
-Check Cronbach’s Alpha 
+Check Cronbach’s Alpha for 4 latent factors 
 ```{r}
 # three latent factors for IVs based on this model:model_11_DV_CULT_INTG_5
 names(model_11_IVs)
@@ -400,3 +400,24 @@ latent_factor_4 <- alpha(model_11_IVs[,c(3, 22)]) # 0.61
 
 
 ```
+
+Check Cronbach’s Alpha for 5 latent factors 
+
+```{r}
+names(model_11_IVs)
+
+latent_factr_1_5 <- alpha(model_11_IVs[, c(12, 13:15, 20, 26)]) # 0.87
+
+latent_factr_2_5 <- alpha(model_11_IVs[, c(24, 18:19, 4, 28)]) # 0.84
+
+latent_factr_3_5 <- alpha(model_11_IVs[, c(11, 6:8)]) # 0.84, if item 8 dropped, then cronach alph improve to 0.86
+
+latent_factr_4_5 <- alpha(model_11_IVs[, c(5, 9, 1)]) # 0.89
+
+latent_factr_5_5 <- alpha(model_11_IVs[, c(2, 17)]) # 0.82
+
+
+
+
+```
+
