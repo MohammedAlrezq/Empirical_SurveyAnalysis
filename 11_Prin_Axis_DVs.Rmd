@@ -83,15 +83,15 @@ psych::print.psych(model_11_DV_2F_delt_CULT_INTG_5, cut = 0.3, sort=TRUE)
 ```{r}
 # with factor = 3
 set.seed(1234)
-model_11_DV_F3 <- psych::fa(model_11_DVs,nfactors = 3, fm = "pa", rotate = "oblimin", max.iter = 100)
+model_11_DV_F3 <- psych::fa(model_11_DVs,nfactors = 3, fm = "pa", rotate = "promax", max.iter = 100)
 psych::print.psych(model_11_DV_F3, cut = 0.3, sort=TRUE)
 names(model_11_DVs)
 
 ################Experimenting removing some items from DVs ###########################################
+#The is the final mdoel and included in the progress meeting  
 # Excluding CULT_INTG_5
 set.seed(12324)
 model_11_DV_CULT_INTG_5 <- psych::fa(model_11_DVs[, -which(names(model_11_DVs) == "CULT_INTG_5")],nfactors = 3, fm = "pa", rotate = "promax", max.iter = 100)
-psych::print.psych(model_11_DV_CULT_INTG_5, cut = 0.3, sort=TRUE)
 psych::print.psych(model_11_DV_CULT_INTG_5, sort = TRUE) # print loading w/o supressed low loadings 
 # Note: this is best soltuion with 3 factros. crossloading <0.75, explained variance = 0.69, and item 10's commonality =0.38
 mean(model_11_DV_CULT_INTG_5$communality)

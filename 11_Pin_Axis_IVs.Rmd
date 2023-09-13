@@ -215,32 +215,22 @@ psych::print.psych(model_11_IV_F5_promx, cut = 0.3, sort=TRUE)
 # Best soltuion with 5 factors using promax 
 set.seed(232333)
 model_11_IV_F5_9items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2","INSTIT_17", "SCOPE_16", "GOAL_AL_27", "TEAM_ST_29", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "ORG_CHR_10")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
-psych::print.psych(model_11_IV_F5_9items, sort=TRUE)
+psych::print.psych(model_11_IV_F5_9items, cut = 0.3, sort=TRUE)
 
 mean(model_11_IV_F5_9items$communality)
 str(model_11_IV_F5_9items)
 
 structure_matx <- model_11_IV_F5_9items$Structure
 
-```
+# Final model shared with Eileen and presented in progress meeting 
+set.seed(23233300)
+model_11_IV_F5_11items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("ORG_CUL_2","INSTIT_17", "SCOPE_16", "GOAL_AL_27", "TEAM_ST_29", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "ORG_CHR_10", "RES_CHG_8", "SYS_COM_28")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5_11items, sort=TRUE)
 
-# Number of factors is 5 factors. Uisng Oblique "cluster" and another package 
-```{r}
-# with factor = 5
-set.seed(2323300)
-model_11_IV_F5_Promax <- psych::fa(model_11_IVs[, -which(names(model_11_IVs) == "SCOPE_16")],nfactors = 5, fm = "pa", rotate = "cluster", max.iter = 100)
-psych::print.psych(model_11_IV_F5_Promax, cut = 0.3, sort=TRUE)
-# this solution may mak4e sense but need to kknow the cluster method 
-# 
-# Using EFA function 
-install.packages("EFAtools")
-library(EFAtools)
-EFA_VDs <- EFAtools::EFA(model_11_IVs, n_factors = 6, method = "PAF", rotation = "oblimin", normalize = FALSE )
+mean(model_11_IV_F5_11items$communality)
 
-Nfactro <- N_FACTORS(model_11_IVs, criteria = c("CD", "EKC", "HULL", "KGC", "PARALLEL", "SCREE", "SMT"), method = "PAF", N_samples = 67)
 
 ```
-
 
 
 # Number of factors is 4 factors
@@ -401,7 +391,7 @@ latent_factor_4 <- alpha(model_11_IVs[,c(3, 22)]) # 0.61
 
 ```
 
-Check Cronbach’s Alpha for 5 latent factors 
+Check Cronbach’s Alpha for 5 latent factors and delete *9 items*: "ORG_CUL_2","INSTIT_17", "SCOPE_16", "GOAL_AL_27", "TEAM_ST_29", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "ORG_CHR_10" from model model_11_IV_F5_9items
 
 ```{r}
 names(model_11_IVs)
@@ -410,14 +400,34 @@ latent_factr_1_5 <- alpha(model_11_IVs[, c(12, 13:15, 20, 26)]) # 0.87
 
 latent_factr_2_5 <- alpha(model_11_IVs[, c(24, 18:19, 4, 28)]) # 0.84
 
-latent_factr_3_5 <- alpha(model_11_IVs[, c(11, 6:8)]) # 0.84, if item 8 dropped, then cronach alph improve to 0.86
+latent_factr_3_5 <- alpha(model_11_IVs[, c(11, 6:7)]) # 0.84, if item 8 dropped, then cronach alph improve to 0.86
 
 latent_factr_4_5 <- alpha(model_11_IVs[, c(5, 9, 1)]) # 0.89
 
-latent_factr_5_5 <- alpha(model_11_IVs[, c(2, 17)]) # 0.82
+latent_factr_5_5 <- alpha(model_11_IVs[, c(3, 22)]) # 0.82
 
 
 
 
+```
+
+Check Cronbach’s Alpha for 5 latent factors and deleted *11 items*: ORG_CUL_2","INSTIT_17", "SCOPE_16", "GOAL_AL_27", "TEAM_ST_29", "GOAL_CL_25", "COM_KNW_23", "EXT_CON_21", "ORG_CHR_10", "RES_CHG_8", "SYS_COM_28". *This is the final model and presented in progress meeting*
+```{r}
+latent_factr_1_55 <- alpha(model_11_IVs[, c(12, 13:15, 20, 26)]) #0.87
+
+latent_factr_2_55 <- alpha(model_11_IVs[, c(24, 18:19, 4)]) # 0.84   
+
+latent_factr_3_55 <- alpha(model_11_IVs[, c(5, 9, 1)]) # 0.89
+
+latent_factr_4_55 <- alpha(model_11_IVs[, c(11, 6:7)]) # 0.86
+
+latent_factr_5_55 <- alpha(model_11_IVs[, c(3, 22)]) # 0.61
+
+# Recheck the final dataset for KMO and Bartlet's after deleting 11 items 
+data_5factor <- model_11_IVs[, c(1, 3:7, 9, 11:15, 18:20, 22, 24, 26) ]
+
+KMO(data_5factor) # MSA =  0.83
+
+psych::cortest.bartlett(data_5factor) # sig p value <0.05
 ```
 
