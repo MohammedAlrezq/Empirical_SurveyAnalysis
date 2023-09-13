@@ -180,5 +180,13 @@ latent_factor_2 <- alpha(model_11_DVs[,2:3]) # 0.82
 
 latent_factor_3 <- alpha(model_11_DVs[,6:7]) # 0.82
 
+names(model_11_DVs)
+data_DVs <- model_11_DVs |> 
+  select(-CULT_INTG_5)
+
+# KMO
+psych::KMO(data_DVs) #  MSA = 0.90
+# bartlet's test 
+psych::cortest.bartlett(data_DVs)# sing p-value 
 ```
 
