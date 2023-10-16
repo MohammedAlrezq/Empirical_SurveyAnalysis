@@ -190,3 +190,13 @@ psych::KMO(data_DVs) #  MSA = 0.90
 psych::cortest.bartlett(data_DVs)# sing p-value 
 ```
 
+# Create daatset for SEM-PLS based on the results of factor analysis for DVs and IVs 
+```{r}
+names(model_11)
+
+sem_plsData <- model_11 |> 
+  select(IMPL_SUCC_1, BUDG_COMP_2, TASK_COMP_3,STAKEH_ACC_4, DEPLOY_6, ACT_INTG_7, EMPL_SKI_8, EMPL_SAT_9, EMPL_BEL_10, BUSI_IMP_11, ORG_IMP_12, DEC_IMP_13, LD_SUP_1, EMP_ATT_3, RES_AVL_4, LD_INV_5, PRJ_SEL_6, DEF_MEA_7, LD_STL_9, DAT_QLT_11, EMP_ENG_12, TOOL_AP_13, CONTX_CUS_14, EFT_REQ_15, TRA_EDUC_18, WKF_SKL_19, EXP_CON_20, UND_CNG_22, PAT_RES_24, CUS_IDEF_26)
+
+write.csv(sem_plsData, "sem_plsData.csv")
+```
+
