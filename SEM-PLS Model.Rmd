@@ -26,7 +26,7 @@ sem_plsData <- sem_plsData |>
 names(sem_plsData)
 ```
 
-# Rename items
+# Rename items for ease of use in sempls model 
 ```{r}
 sem_plsData <- sem_plsData |> 
   rename(TS1 = EMPL_SAT_9,
@@ -60,8 +60,6 @@ sem_plsData <- sem_plsData |>
          CA1 = EMP_ATT_3,
          CA2 = UND_CNG_22)
 
-names(sem_plsData)
-
 # Reorder the columns in the dataframe to run
 sem_plsData <- sem_plsData |> 
   select(TS1, TS2, TS3, TS4, TS5, TS6, TS7, TS8, DS1, DS2, IPS1, IPS2, IR1, IR2, IR3, IR4, IR5, IR6, SII1, SII2, SII3, SII4, SL1, SL2, SL3, MBI1, MBI2, MBI3, CA1, CA2)
@@ -70,6 +68,7 @@ sem_plsData <- sem_plsData |>
 
 # Create measurment model 
 ```{r}
+set.seed(545)
 meas_model <- constructs(
   composite("Transformation_Success", multi_items("TS", 1:8), weights = mode_A),
   composite("Deployment_Success", multi_items("DS", 1:2), weights = mode_A),
@@ -85,6 +84,7 @@ meas_model <- constructs(
 
 # Create structural model 
 ```{r}
+set.seed(214)
 struc_model <- relationships(
   paths(from = c("Improvement_Readiness", "Sustainable_Improvement_Infrastructure", "Supportive_Leadership", "Measures_based_Improvement", "Change_Awareness"), to = c("Transformation_Success", "Deployment_Success", "Improvement_Project_Success")
         ))
@@ -94,9 +94,48 @@ struc_model <- relationships(
 
 # Estimate the model
 ```{r}
+set.seed(123)
 model_est <- estimate_pls(sem_plsData, measurement_model = meas_model, structural_model = struc_model,inner_weights = path_weighting)
 
-summary(model_est)
+model_est_summary <- summary(model_est)
+
+# max iteration: should be less than 300 max no. of iteration
+model_est_summary$iterations # iteration =6 which is good 
+
+#(1) indicator's reliability and 
+model_est_summary$loadings
+model_est_summary$loadings^2
+
+#(2) Internal consistency reliability
+model_est_summary$reliability # the rhoA between alpha and rhoC
+plot(model_est_summary$reliability)
+
+# (3) Convergent validity
+model_est_summary$reliability # all AVE above 0.5
+
+# (4) Discriminant validity: the resutls are good
+model_est_summary$validity$fl_criteria
+model_est_summary$validity$htmt
+
+#HTMT with boost fopr discremenant validity 
+boost_summary$bootstrapped_HTMT
+
+# cross loading for discreminant validity 
+model_est_summary$validity$cross_loadings
 ```
 
+# Bootstrap the model 
+```{r}
+boost_model <- bootstrap_model(seminr_model = model_est,
+                               nboot = 10000,
+                               cores = NULL)
+
+boost_summary <- summary(boost_model)
+
+plot(model_est_summary$reliability)
+
+# sing paths
+boost_summary$bootstrapped_paths
+
+```
 
