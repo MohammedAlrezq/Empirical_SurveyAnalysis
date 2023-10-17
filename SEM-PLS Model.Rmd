@@ -1,0 +1,69 @@
+---
+title: "SEM-PLS"
+author: "Mohammed Alrezq"
+date: "2023-10-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("seminr")
+library(seminr)
+library(c(tidyverse, psych)
+
+```
+
+
+# Download data 
+```{r}
+sem_plsData <- read.csv("sem_plsData.csv")
+# remove extra column 
+sem_plsData <- sem_plsData |>
+  select(-1)
+names(sem_plsData)
+```
+
+# Rename items
+```{r}
+sem_plsData <- sem_pls
+```
+
+
+# Create measurment model 
+```{r}
+meas_model <- constructs(
+  composite("Improvement_Readiness", c("EMP_ENG_12", "TOOL_AP_13", "CONTX_CUS_14", "EFT_REQ_15", "EXP_CON_20", "CUS_IDEF_26"), weights = mode_A),
+  composite("Sustainable_Improvement_Infrastructure", c("RES_AVL_4", "TRA_EDUC_18", "WKF_SKL_19", "PAT_RES_24"), weights = mode_A),
+  composite("Supportive_Leadership", c("LD_SUP_1", "LD_INV_5", "LD_STL_9") , weights = mode_A), 
+  composite("Measures_based_Improvement", c("PRJ_SEL_6", "DEF_MEA_7", "DAT_QLT_11") , weights = mode_A),
+  composite("Change_Awareness", c("EMP_ATT_3", "UND_CNG_22") , weights = mode_A),
+  composite("Transformation_Success", c("IMPL_SUCC_1", "STAKEH_ACC_4", "EMPL_SKI_8", "EMPL_SAT_9", "EMPL_BEL_10", "BUSI_IMP_11", "ORG_IMP_12", "DEC_IMP_13"), weights = mode_A),
+  composite("Deployment_Success", c("DEPLOY_6", "ACT_INTG_7") , weights = mode_A),
+  composite("Improvement_Project_Success", c("BUDG_COMP_2", "TASK_COMP_3") , weights = mode_A)
+  
+)
+
+```
+
+# Create structural model 
+```{r}
+struc_model <- relationships(
+  paths(from = c("Improvement_Readiness", "Sustainable_Improvement_Infrastructure", "Supportive_Leadership", "Measures_based_Improvement", "Change_Awareness"), to =c("Transformation_Success", "Deployment_Success", "Improvement_Project_Success")
+        )
+
+  
+```
+
+# Estimate the model
+```{r}
+model_est <- estimate_pls(sem_plsData, measurement_model = meas_model, structural_model = struc_model,inner_weights = path_weighting)
+
+```
+
+
+
+
+
