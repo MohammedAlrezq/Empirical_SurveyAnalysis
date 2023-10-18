@@ -86,8 +86,8 @@ meas_model <- constructs(
 ```{r}
 set.seed(214)
 struc_model <- relationships(
-  paths(from = c("Improvement_Readiness", "Sustainable_Improvement_Infrastructure", "Supportive_Leadership", "Measures_based_Improvement", "Change_Awareness"), to = c("Transformation_Success", "Deployment_Success", "Improvement_Project_Success")
-        ))
+  paths(to = c("Transformation_Success", "Deployment_Success", "Improvement_Project_Success"),
+         from = c("Improvement_Readiness", "Sustainable_Improvement_Infrastructure", "Supportive_Leadership", "Measures_based_Improvement", "Change_Awareness")))
 
   
 ```
@@ -105,10 +105,12 @@ model_est_summary$iterations # iteration =6 which is good
 #(1) indicator's reliability and 
 model_est_summary$loadings
 model_est_summary$loadings^2
+write.csv(model_est_summary$loadings, "SEM-PLS_factor_Loading.csv")
 
 #(2) Internal consistency reliability
 model_est_summary$reliability # the rhoA between alpha and rhoC
 plot(model_est_summary$reliability)
+write.csv(model_est_summary$reliability, "Internal consistency reliability.csv")
 
 # (3) Convergent validity
 model_est_summary$reliability # all AVE above 0.5
@@ -134,8 +136,7 @@ boost_summary <- summary(boost_model)
 
 plot(model_est_summary$reliability)
 
-# sing paths
-boost_summary$bootstrapped_paths
+
 
 ```
 
