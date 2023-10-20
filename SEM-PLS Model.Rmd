@@ -66,7 +66,7 @@ sem_plsData <- sem_plsData |>
 ```
 
 
-# Create measurment model 
+# Create measurment model (outer model)
 ```{r}
 set.seed(545)
 meas_model <- constructs(
@@ -82,7 +82,7 @@ meas_model <- constructs(
 
 ```
 
-# Create structural model 
+# Create structural model (inner model)
 ```{r}
 set.seed(214)
 struc_model <- relationships(
@@ -105,12 +105,12 @@ model_est_summary$iterations # iteration =6 which is good
 #(1) indicator's reliability and 
 model_est_summary$loadings
 model_est_summary$loadings^2
-write.csv(model_est_summary$loadings, "SEM-PLS_factor_Loading.csv")
+#write.csv(model_est_summary$loadings^2, "SEM-PLS_indicator_reliability_squared.csv")
 
 #(2) Internal consistency reliability
 model_est_summary$reliability # the rhoA between alpha and rhoC
 plot(model_est_summary$reliability)
-write.csv(model_est_summary$reliability, "Internal consistency reliability.csv")
+#write.csv(model_est_summary$reliability, "Internal consistency reliability.csv")
 
 # (3) Convergent validity
 model_est_summary$reliability # all AVE above 0.5
@@ -128,15 +128,26 @@ model_est_summary$validity$cross_loadings
 
 # Bootstrap the model 
 ```{r}
+set.seed(147)
 boost_model <- bootstrap_model(seminr_model = model_est,
                                nboot = 10000,
-                               cores = NULL)
+                               cores = parallel::detectCores(), )
 
-boost_summary <- summary(boost_model)
+boost_summary <- summary(boost_model, alpha = 0.05)
+```
+
+
+```{r}
+#(1) VIF from the estimated model NOT the boost model 
+model_est_summary$vif_antecedents
+#write.csv(model_est_summary$vif_antecedents, "VIF_score.csv")
 
 plot(model_est_summary$reliability)
 
 
 
 ```
+
+
+
 
