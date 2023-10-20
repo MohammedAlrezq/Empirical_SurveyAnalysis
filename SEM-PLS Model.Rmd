@@ -165,7 +165,6 @@ predict_model <- predict_pls(
   reps = 10
 )
 predict_summary <- summary(predict_model)
-write.csv(predict_summary, "PLS_predective_power.csv")
 
 # analysis of the distribtuion to select RMSE or MEA
 par(mfrow=c(3,4)) 
