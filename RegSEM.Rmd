@@ -1,0 +1,117 @@
+---
+title: "Reg. SEM"
+author: "Mohammed Alrezq"
+date: "2023-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#install.packages("seminr")
+library(seminr)
+library(tidyverse)
+library(psych)
+library(lavaan)
+library(semPlot)
+```
+
+
+# Download data 
+```{r}
+sem_plsData <- read.csv("sem_plsData.csv")
+# remove extra column 
+sem_plsData <- sem_plsData |>
+  select(-1)
+names(sem_plsData)
+```
+
+# Rename items for ease of use in sempls model 
+```{r}
+sem_plsData <- sem_plsData |> 
+  rename(TS1 = EMPL_SAT_9,
+         TS2 = ORG_IMP_12,
+         TS3 = STAKEH_ACC_4,
+         TS4 = EMPL_SKI_8,
+         TS5 = DEC_IMP_13,
+         TS6 = BUSI_IMP_11,
+         TS7 = IMPL_SUCC_1,
+         TS8 = EMPL_BEL_10,
+         DS1 = DEPLOY_6,
+         DS2 = ACT_INTG_7,
+         IPS1 = BUDG_COMP_2,
+         IPS2 = TASK_COMP_3,
+         IR1 = TOOL_AP_13,
+         IR2 = CONTX_CUS_14,
+         IR3 = EFT_REQ_15,
+         IR4 = EMP_ENG_12,
+         IR5 = EXP_CON_20,
+         IR6 = CUS_IDEF_26,
+         SII1 = TRA_EDUC_18,
+         SII2 = PAT_RES_24,
+         SII3 = WKF_SKL_19,
+         SII4 = RES_AVL_4,
+         SL1 = LD_STL_9,
+         SL2 = LD_INV_5,
+         SL3 = LD_SUP_1,
+         MBI1 = DAT_QLT_11,
+         MBI2 = DEF_MEA_7,
+         MBI3 = PRJ_SEL_6,
+         CA1 = EMP_ATT_3,
+         CA2 = UND_CNG_22)
+
+# Reorder the columns in the dataframe to run
+sem_plsData <- sem_plsData |> 
+  select(TS1, TS2, TS3, TS4, TS5, TS6, TS7, TS8, DS1, DS2, IPS1, IPS2, IR1, IR2, IR3, IR4, IR5, IR6, SII1, SII2, SII3, SII4, SL1, SL2, SL3, MBI1, MBI2, MBI3, CA1, CA2)
+```
+
+# CFA (measurement model)
+```{r}
+#Creating measurement portion of full model
+cfa_model <- 'Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
+Deployment_success =~ DEPLOY_6 + ACT_INTG_7
+Improvement_Proj_success =~ BUDG_COMP_2 + TASK_COMP_3
+Improvement_Readiness =~ TOOL_AP_13 + CONTX_CUS_14 + EFT_REQ_15 + EMP_ENG_12 + EXP_CON_20 + CUS_IDEF_26
+Sust_Impr_Infrasturcture =~ TRA_EDUC_18 + PAT_RES_24 + WKF_SKL_19 + RES_AVL_4
+Supportive_Leadership =~ LD_STL_9 + LD_INV_5 + LD_SUP_1
+Meas_based_improvement =~ DAT_QLT_11 + DEF_MEA_7 + PRJ_SEL_6 
+Change_awareness =~ EMP_ATT_3 + UND_CNG_22
+
+'
+# CFA model fit 
+cfa_fit <- cfa(cfa_model, data = sem_plsData)
+summary(cfa_fit, fit.measures=T, standardized=T)
+
+# TO PLOT
+semPaths(cfa_fit,what="stand",layout="tree")
+```
+
+# Structual model 
+```{r}
+sem_model <- 
+# measurement model
+'Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
+Deployment_success =~ DEPLOY_6 + ACT_INTG_7
+Improvement_Proj_success =~ BUDG_COMP_2 + TASK_COMP_3
+Improvement_Readiness =~ TOOL_AP_13 + CONTX_CUS_14 + EFT_REQ_15 + EMP_ENG_12 + EXP_CON_20 + CUS_IDEF_26
+Sust_Impr_Infrasturcture =~ TRA_EDUC_18 + PAT_RES_24 + WKF_SKL_19 + RES_AVL_4
+Supportive_Leadership =~ LD_STL_9 + LD_INV_5 + LD_SUP_1
+Meas_based_improvement =~ DAT_QLT_11 + DEF_MEA_7 + PRJ_SEL_6 
+Change_awareness =~ EMP_ATT_3 + UND_CNG_22
+
+# structural model
+Transformational_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
+Deployment_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
+Improvement_Proj_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
+'
+
+sem_fit <- sem(sem_model, data = sem_plsData)
+summary(sem_fit, fit.measures=T, standardized=T)
+
+
+semPaths(sem_fit,what="stand",layout="tree")
+```
+
