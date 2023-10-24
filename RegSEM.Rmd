@@ -17,6 +17,7 @@ library(tidyverse)
 library(psych)
 library(lavaan)
 library(semPlot)
+library(regsem)
 ```
 
 
@@ -91,9 +92,9 @@ semPaths(cfa_fit,what="stand",layout="tree")
 
 # Structual model 
 ```{r}
-sem_model <- 
+sem_model <- '
 # measurement model
-'Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
+Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
 Deployment_success =~ DEPLOY_6 + ACT_INTG_7
 Improvement_Proj_success =~ BUDG_COMP_2 + TASK_COMP_3
 Improvement_Readiness =~ TOOL_AP_13 + CONTX_CUS_14 + EFT_REQ_15 + EMP_ENG_12 + EXP_CON_20 + CUS_IDEF_26
@@ -109,9 +110,26 @@ Improvement_Proj_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supp
 '
 
 sem_fit <- sem(sem_model, data = sem_plsData)
-summary(sem_fit, fit.measures=T, standardized=T)
+summary(sem_fit, fit.measures=T, rsquare= T, standardized=T)
 
 
 semPaths(sem_fit,what="stand",layout="tree")
+```
+
+#RegSEM Structursal model (this to test regulization on structural/reltionship model)
+```{r}
+# fit lasso 
+lass_cv <- cv_regsem(sem_fit,
+                     type = "lasso",
+                     pars_pen = c("regressions",
+                                  gradFun = "ram",
+                                  n.lambda = 100,
+                                  jump = 0.05))
+
+plot(lass_cv, show.minimum = "BIC")
+summary(lass_cv)
+lass_cv$final_pars
+
+head(lass_cv$fits, 50)
 ```
 
