@@ -123,7 +123,7 @@ w#rite.csv(model_est_summary$validity$htmt, "discreminant_validity_HTMT.csv")
 
 #HTMT with boost for discriminant validity 
 boost_summary$bootstrapped_HTMT
-#write.csv(boost_summary$bootstrapped_HTMT, "discreminant_validity_HTMTBoost.csv")
+#write.csv(boost_summary$bootstrapped_HTMT, "discreminant_validity_HTMTBoost2.csv")
 
 # cross loading for discriminant validity 
 model_est_summary$validity$cross_loadings
