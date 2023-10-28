@@ -28,6 +28,8 @@ sem_plsData <- read.csv("sem_plsData.csv")
 sem_plsData <- sem_plsData |>
   select(-1)
 names(sem_plsData)
+
+str(sem_plsData)
 ```
 
 # Rename items for ease of use in sempls model 
@@ -90,9 +92,10 @@ summary(cfa_fit, fit.measures=T, standardized=T)
 semPaths(cfa_fit,what="stand",layout="tree")
 ```
 
-# Structual model 
+# Measurement and Structual model 
 ```{r}
 sem_model <- '
+
 # measurement model
 Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
 Deployment_success =~ DEPLOY_6 + ACT_INTG_7
@@ -107,13 +110,32 @@ Change_awareness =~ EMP_ATT_3 + UND_CNG_22
 Transformational_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
 Deployment_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
 Improvement_Proj_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
-'
 
-sem_fit <- sem(sem_model, data = sem_plsData)
+#DVs: 
+Transformational_success~~Transformational_success
+Deployment_success~~Deployment_success
+Improvement_Proj_success~~Improvement_Proj_success
+
+# IVs: no co(variance) among IVs
+Improvement_Readiness~~Improvement_Readiness
+Sust_Impr_Infrasturcture~~Sust_Impr_Infrasturcture
+Supportive_Leadership~~Supportive_Leadership
+Meas_based_improvement~~Meas_based_improvement
+Change_awareness~~Change_awareness
+'
+```
+
+# SEM model 
+```{r}
+sem_fit <- sem(sem_model, data = sem_plsData, estimator="ML")
 summary(sem_fit, fit.measures=T, rsquare= T, standardized=T)
 
+# SEM with estimator => estimator="DWLS"
+sem_fit_DWLS <- sem(sem_model, data = sem_plsData, estimator="DWLS")
+summary(sem_fit_DWLS, fit.measures=T, rsquare= T, standardized=T)
 
-semPaths(sem_fit,what="stand",layout="tree")
+# Path
+semPaths(sem_fit,whatLabels = "std", layout="tree", style = "Lisrel")
 ```
 
 #RegSEM Structursal model (this to test regulization on structural/reltionship model)
@@ -124,11 +146,11 @@ lass_cv <- cv_regsem(sem_fit,
                      pars_pen = c("regressions",
                                   gradFun = "ram",
                                   n.lambda = 100,
-                                  jump = 0.05))
-
-plot(lass_cv, show.minimum = "BIC")
+                                  jump = 0.01))
 summary(lass_cv)
 lass_cv$final_pars
+
+plot(lass_cv, show.minimum = "BIC")
 
 head(lass_cv$fits, 50)
 ```
