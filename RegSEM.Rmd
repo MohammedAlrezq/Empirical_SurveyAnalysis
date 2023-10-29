@@ -31,6 +31,10 @@ names(sem_plsData)
 
 str(sem_plsData)
 ```
+# Check mutlinormality 
+```{r}
+psych::mardia(sem_plsData)
+```
 
 # Rename items for ease of use in sempls model 
 ```{r}
