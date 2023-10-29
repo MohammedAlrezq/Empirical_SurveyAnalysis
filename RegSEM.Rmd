@@ -88,17 +88,34 @@ Meas_based_improvement =~ DAT_QLT_11 + DEF_MEA_7 + PRJ_SEL_6
 Change_awareness =~ EMP_ATT_3 + UND_CNG_22
 
 '
-# CFA model fit 
+# CFA model fit= ml 
 cfa_fit <- cfa(cfa_model, data = sem_plsData)
 summary(cfa_fit, fit.measures=T, standardized=T)
 
+# CFA model fit= test="Satorra.Bentler"
+cfa_fit <- cfa(cfa_model, data = sem_plsData, test="Satorra.Bentler")
+summary(cfa_fit, fit.measures=T, standardized=T)
+
+# CFA model fit= test="Yuan.Bentler"
+cfa_fit <- cfa(cfa_model, data = sem_plsData, test="Yuan.Bentler")
+summary(cfa_fit, fit.measures=T, standardized=T)
+
+# CFA model fit= test="Bollen.Stine"
+cfa_fit_BS <- cfa(cfa_model, data = sem_plsData, test="Bollen.Stine")
+summary(cfa_fit_BS, fit.measures=T, standardized=T)
+
+# CFA model fit= estimator = WLSMV
+cfa_fit_BS <- cfa(cfa_model, data = sem_plsData, test="Bollen.Stine")
+summary(cfa_fit_BS, fit.measures=T, standardized=T)
+
+
 # TO PLOT
-semPaths(cfa_fit,what="stand",layout="tree")
+semPaths(cfa_fit,what="stand",layout="tree", style = "LISREL")
 ```
 
 # Measurement and Structual model 
 ```{r}
-sem_model <- '
+meas_model <- '
 
 # measurement model
 Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
@@ -115,6 +132,7 @@ Transformational_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supp
 Deployment_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
 Improvement_Proj_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
 
+'
 #DVs: 
 Transformational_success~~Transformational_success
 Deployment_success~~Deployment_success
@@ -126,17 +144,21 @@ Sust_Impr_Infrasturcture~~Sust_Impr_Infrasturcture
 Supportive_Leadership~~Supportive_Leadership
 Meas_based_improvement~~Meas_based_improvement
 Change_awareness~~Change_awareness
-'
 ```
 
 # SEM model 
 ```{r}
-sem_fit <- sem(sem_model, data = sem_plsData, estimator="ML")
+sem_fit <- sem(meas_model, data = sem_plsData)
 summary(sem_fit, fit.measures=T, rsquare= T, standardized=T)
+modificationindices(sem_fit, sort. = TRUE)
 
 # SEM with estimator => estimator="DWLS"
 sem_fit_DWLS <- sem(sem_model, data = sem_plsData, estimator="DWLS")
 summary(sem_fit_DWLS, fit.measures=T, rsquare= T, standardized=T)
+
+# SEM with estimator => estimator="WLSMV"
+sem_fit_WLSMV <- sem(sem_model, data = sem_plsData, estimator="WLSMV", bootstrap = 1000)
+summary(sem_fit_WLSMV, fit.measures=T, rsquare= T, standardized=T)
 
 # Path
 semPaths(sem_fit,whatLabels = "std", layout="tree", style = "Lisrel")
