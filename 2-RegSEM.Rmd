@@ -1,0 +1,107 @@
+---
+title: "2-RegSEM"
+author: "Mohammed Alrezq"
+date: "2023-11-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("seminr")
+library(seminr)
+library(tidyverse)
+library(psych)
+library(lavaan)
+library(semPlot)
+library(regsem)
+```
+
+
+# Download data 
+```{r}
+sem_plsData <- read.csv("sem_plsData.csv")
+# remove extra column 
+sem_plsData <- sem_plsData |>
+  select(-1)
+names(sem_plsData)
+
+str(sem_plsData)
+
+#sem_plsData <- scale(sem_plsData)
+```
+# Check mutlinormality 
+```{r}
+psych::mardia(sem_plsData)
+```
+
+# Measurement and Structual model 
+```{r}
+meas_model <- '
+
+# measurement model
+Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
+Deployment_success =~ DEPLOY_6 + ACT_INTG_7
+Improvement_Proj_success =~ BUDG_COMP_2 + TASK_COMP_3
+Improvement_Readiness =~ TOOL_AP_13 + CONTX_CUS_14 + EFT_REQ_15 + EMP_ENG_12 + EXP_CON_20 + CUS_IDEF_26
+Sust_Impr_Infrasturcture =~ TRA_EDUC_18 + PAT_RES_24 + WKF_SKL_19 + RES_AVL_4
+Supportive_Leadership =~ LD_STL_9 + LD_INV_5 + LD_SUP_1
+Meas_based_improvement =~ DAT_QLT_11 + DEF_MEA_7 + PRJ_SEL_6 
+Change_awareness =~ EMP_ATT_3 + UND_CNG_22
+
+# structural model
+Transformational_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
+Deployment_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
+Improvement_Proj_success~ Improvement_Readiness+ Sust_Impr_Infrasturcture + Supportive_Leadership + Meas_based_improvement + Change_awareness
+'
+
+
+#### Omitting Latent factor covariance
+# Improvement_Readiness~~ 0*Sust_Impr_Infrasturcture
+# Improvement_Readiness~~ 0*Supportive_Leadership
+# Improvement_Readiness~~ 0*Meas_based_improvement
+# Improvement_Readiness~~ 0*Change_awareness
+# 
+# Sust_Impr_Infrasturcture~~0*Supportive_Leadership
+# Sust_Impr_Infrasturcture~~0*Meas_based_improvement
+# Sust_Impr_Infrasturcture~~0*Change_awareness
+# 
+# Supportive_Leadership~~0*Meas_based_improvement
+# Supportive_Leadership~~0*Change_awareness
+# 
+# Meas_based_improvement~~0*Change_awareness
+
+#DVs: 
+Transformational_success~~Transformational_success
+Deployment_success~~Deployment_success
+Improvement_Proj_success~~Improvement_Proj_success
+
+# IVs: no co(variance) among IVs
+Improvement_Readiness~~Improvement_Readiness
+Sust_Impr_Infrasturcture~~Sust_Impr_Infrasturcture
+Supportive_Leadership~~Supportive_Leadership
+Meas_based_improvement~~Meas_based_improvement
+Change_awareness~~Change_awareness
+```
+
+# SEM model 
+```{r}
+# SEM model 
+
+sem_fit <- sem(meas_model, data = sem_plsData, se = "bootstrap" , bootstrap = 1000)
+summary(sem_fit, fit.measures=T, rsquare= T, standardized=T, modindices = T)
+modificationindices(sem_fit, sort. = TRUE)# used to check which parameters can improve SEM fit, but always acceptable 
+# to identify all parameters 
+parameterEstimates(sem_fit)
+
+# Paths 
+semPaths(sem_fit,whatLabels = "est", style = "ram")
+
+# install.packages("lavaanPlot")
+# library(lavaanPlot)
+# lavaanPlot(name = "plot", sem_fit)
+
+```
+
