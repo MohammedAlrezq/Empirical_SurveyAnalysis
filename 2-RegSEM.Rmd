@@ -42,9 +42,12 @@ psych::mardia(sem_plsData)
 meas_model <- '
 
 # measurement model
+# Endogenous LVs
 Transformational_success =~ EMPL_SAT_9 + ORG_IMP_12 + STAKEH_ACC_4 + EMPL_SKI_8 + DEC_IMP_13 + BUSI_IMP_11 + IMPL_SUCC_1 + EMPL_BEL_10
 Deployment_success =~ DEPLOY_6 + ACT_INTG_7
 Improvement_Proj_success =~ BUDG_COMP_2 + TASK_COMP_3
+
+# Exogenous LVs 
 Improvement_Readiness =~ TOOL_AP_13 + CONTX_CUS_14 + EFT_REQ_15 + EMP_ENG_12 + EXP_CON_20 + CUS_IDEF_26
 Sust_Impr_Infrasturcture =~ TRA_EDUC_18 + PAT_RES_24 + WKF_SKL_19 + RES_AVL_4
 Supportive_Leadership =~ LD_STL_9 + LD_INV_5 + LD_SUP_1
@@ -86,10 +89,14 @@ Meas_based_improvement~~Meas_based_improvement
 Change_awareness~~Change_awareness
 ```
 
-# SEM model 
+# SEM model using ML estimation 
 ```{r}
 # SEM model 
+sem_fit <- sem(meas_model, data = sem_plsData)
+summary(sem_fit, fit.measures=T, rsquare= T, standardized=T)
+modificationindices(sem_fit, sort. = TRUE)#
 
+# SEM model with bootstrap
 sem_fit <- sem(meas_model, data = sem_plsData, se = "bootstrap" , bootstrap = 1000)
 summary(sem_fit, fit.measures=T, rsquare= T, standardized=T, modindices = T)
 modificationindices(sem_fit, sort. = TRUE)# used to check which parameters can improve SEM fit, but always acceptable 
@@ -103,5 +110,67 @@ semPaths(sem_fit,whatLabels = "est", style = "ram")
 # library(lavaanPlot)
 # lavaanPlot(name = "plot", sem_fit)
 
+```
+
+# SEM model using MLR estimation 
+```{r}
+# SEM model 
+sem_fit_MLR <- sem(meas_model, data = sem_plsData, estimator = "MLR")
+summary(sem_fit_MLR, fit.measures=T, rsquare= T, standardized=T)
+modificationindices(sem_fit_MLR, sort. = TRUE)#
+```
+
+# RegSEM
+```{r}
+# cross validation using ML (type = "none")
+cv_ml <- cv_regsem(sem_fit,
+                     pars_pen = c("regressions",
+                                  type = "none",
+                                  #gradFun = "ram",
+                                  lambda = seq(0, 0.20, by = 0.05)))
+summary(cv_ml)
+cv_ml$fits
+plot(cv_ml, show.minimum = "BIC", label = TRUE)
+
+
+# cross validation using LASSO 
+lasso_cv <- cv_regsem(sem_fit,
+                     type = "lasso",
+                     pars_pen = c("regressions",
+                                  gradFun = "ram",
+                                  n.lambda = 0.50,
+                                  jump = 0.01, 
+                                  lambda.start = 0))
+summary(lasso_cv)
+
+lasso_cv2 <- cv_regsem(sem_fit,
+                     type = "lasso",
+                     pars_pen = c("regressions",
+                                  gradFun = "ram",
+                                  lambda = seq(0, 0.39, by = 0.01)))
+summary(lasso_cv2)
+
+plot(lasso_cv2, show.minimum = "BIC", label = TRUE)
+
+# BIC PLOT 
+bic_values <- head(lasso_cv2$fits, 40)
+
+metric_values <- lasso_cv2$fits
+metric_values
+
+
+# Extract lambda and BIC values
+lambda_values <- metric_values[, "lambda"]
+bic_values <- metric_values[, "BIC"]
+
+# Plotting the BIC values against lambda
+plot(lambda_values, bic_values, type = 'b', # with a line type of 'b', which means both points and lines are plotted (type = 'b')
+     main = "BIC vs. Penalty", 
+     xlab = "Penalty (λ)", 
+     ylab = "BIC", 
+     col = "blue", pch = 19) # pch = 19 will use solid circles for points
+
+smoothed_values <- smooth.spline(lambda_values, bic_values)
+lines(smoothed_values, col = "green", lwd = 2) # lwd is the line width
 ```
 
