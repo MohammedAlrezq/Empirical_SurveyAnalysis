@@ -197,7 +197,8 @@ lines(smoothed_values, col = "green", lwd = 2) # lwd is the line width
 lasso_final_model <- regsem(sem_fit,
                             type = "lasso",
                             lambda = .21,# value of lambda 
-                            gradFun = "ram")
+                            gradFun = "ram",
+                            alpha = 0)
 summary(lasso_final_model)
 
 # model fit chisquare  
