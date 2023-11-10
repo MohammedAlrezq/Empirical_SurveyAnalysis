@@ -2,14 +2,16 @@
 title: "2-RegSEM"
 author: "Mohammed Alrezq"
 date: "2023-11-01"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, error=FALSE, warning=TRUE}
 #install.packages("seminr")
 library(seminr)
 library(tidyverse)
@@ -94,14 +96,14 @@ Change_awareness~~Change_awareness
 # SEM model 
 sem_fit <- sem(meas_model, data = sem_plsData)
 summary(sem_fit, fit.measures=T, rsquare= T, standardized=T)
-modificationindices(sem_fit, sort. = TRUE)#
+#modificationindices(sem_fit, sort. = TRUE)#
 
 # SEM model with bootstrap
-sem_fit <- sem(meas_model, data = sem_plsData, se = "bootstrap" , bootstrap = 1000)
-summary(sem_fit, fit.measures=T, rsquare= T, standardized=T, modindices = T)
-modificationindices(sem_fit, sort. = TRUE)# used to check which parameters can improve SEM fit, but always acceptable 
+# sem_fit_boot <- sem(meas_model, data = sem_plsData, se = "bootstrap" , bootstrap = 1000)
+# summary(sem_fit_boot, fit.measures=T, rsquare= T, standardized=T, modindices = T)
+# modificationindices(sem_fit, sort. = TRUE)# used to check which parameters can improve SEM fit, but always acceptable 
 # to identify all parameters 
-parameterEstimates(sem_fit)
+#parameterEstimates(sem_fit)
 
 # Paths 
 semPaths(sem_fit,whatLabels = "est", style = "ram")
@@ -114,21 +116,25 @@ semPaths(sem_fit,whatLabels = "est", style = "ram")
 
 # SEM model using MLR estimation 
 ```{r}
-# SEM model 
-sem_fit_MLR <- sem(meas_model, data = sem_plsData, estimator = "MLR")
-summary(sem_fit_MLR, fit.measures=T, rsquare= T, standardized=T)
-modificationindices(sem_fit_MLR, sort. = TRUE)#
+# # SEM model 
+# sem_fit_MLR <- sem(meas_model, data = sem_plsData, estimator = "MLR")# MLR not use with RegSEM
+# summary(sem_fit_MLR, fit.measures=T, rsquare= T, standardized=T)
+# modificationindices(sem_fit_MLR, sort. = TRUE)#
 ```
 
 # RegSEM
 ```{r}
 # cross validation using ML (type = "none")
 cv_ml <- cv_regsem(sem_fit,
-                     pars_pen = c("regressions",
+                     pars_pen = c("regressions"),
                                   type = "none",
-                                  #gradFun = "ram",
-                                  lambda = seq(0, 0.20, by = 0.05)))
-summary(cv_ml)
+                                  n.lambda = 40,
+                                  jump = 0.05,
+                                  lambda.start = 0)
+
+                                  #gradFun = "ram",# used only for use with optMethod="coord_desc".
+                                
+
 cv_ml$fits
 plot(cv_ml, show.minimum = "BIC", label = TRUE)
 
@@ -136,26 +142,29 @@ plot(cv_ml, show.minimum = "BIC", label = TRUE)
 # cross validation using LASSO 
 lasso_cv <- cv_regsem(sem_fit,
                      type = "lasso",
-                     pars_pen = c("regressions",
+                     pars_pen = c("regressions"),
                                   gradFun = "ram",
-                                  n.lambda = 0.50,
+                                  n.lambda = 40,
                                   jump = 0.01, 
-                                  lambda.start = 0))
+                                  lambda.start = 0)
 summary(lasso_cv)
+#extractMatrices(sem_fit)$A
 
-lasso_cv2 <- cv_regsem(sem_fit,
-                     type = "lasso",
-                     pars_pen = c("regressions",
-                                  gradFun = "ram",
-                                  lambda = seq(0, 0.39, by = 0.01)))
-summary(lasso_cv2)
+# this shows lable/number of prameters peanlized 
+lasso_cv$pars_pen
+# Shows penalized coefficient paths among LVs
+lasso_cv$final_pars
+# Disply BIC values and best lambda 
+lasso_cv$fits
 
-plot(lasso_cv2, show.minimum = "BIC", label = TRUE)
+# Plot LASSO that shows the pealized parameters 
+par(mar = c(5.1, 4.1, 4.1, 8.1))  # Increase the right margin
+plot(lasso_cv, show.minimum = "BIC", label = TRUE)
 
 # BIC PLOT 
-bic_values <- head(lasso_cv2$fits, 40)
+bic_values <- head(lasso_cv$fits, 40)
 
-metric_values <- lasso_cv2$fits
+metric_values <- lasso_cv$fits
 metric_values
 
 
@@ -172,5 +181,58 @@ plot(lambda_values, bic_values, type = 'b', # with a line type of 'b', which mea
 
 smoothed_values <- smooth.spline(lambda_values, bic_values)
 lines(smoothed_values, col = "green", lwd = 2) # lwd is the line width
+
+# Computing Schwarz weights from BIC values
+# schwarz_weights <- exp((-0.5 * (bic_values - min(bic_values))))
+# schwarz_weights <- schwarz_weights / sum(schwarz_weights)
+# 
+# barplot(schwarz_weights, names.arg = round(lambda_values, 2), main = "Schwarz Weights",
+#         xlab = "Penalty (λ)", ylab = "Weights")
+#         
 ```
+
+# Use regsem after identify the value of lambda 
+```{r}
+
+lasso_final_model <- regsem(sem_fit,
+                            type = "lasso",
+                            lambda = .21,# value of lambda 
+                            gradFun = "ram")
+summary(lasso_final_model)
+
+# model fit chisquare  
+lasso_final_model$lav.model
+
+
+# to check what stored in the object 
+str(lasso_final_model)
+# Display all measures 
+lasso_final_model$lav.model
+
+lavaan_model <- lasso_final_model$lav.model
+fit_indices <- lavaan::fitMeasures(lavaan_model)
+print(fit_indices)
+
+#Model global measures fit 
+chi_square <- fit_indices["chisq"]
+p_value <- fit_indices["pvalue"]
+df<- fit_indices["df"]
+RMSEA <- fit_indices["rmsea"]
+CFI <- fit_indices["cfi"]
+SRMR <- fit_indices["srmr"]
+TLI <- fit_indices["tli"] 
+
+# Combine them into a list
+fit_indices_list <- list(
+  chi_square = chi_square,
+  p_value = p_value,
+  degrees_of_freedom = df,
+  RMSEA = RMSEA,
+  CFI = CFI,
+  SRMR = SRMR,
+  TLI = TLI)
+
+print(fit_indices_list)
+```
+
 
