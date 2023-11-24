@@ -1,0 +1,147 @@
+---
+title: "1-Regularized Multivariate"
+author: "Mohammed Alrezq"
+date: "2023-11-23"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, error=FALSE, warning=TRUE}
+#install.packages("seminr")
+library(seminr)
+library(tidyverse)
+library(psych)
+library(lavaan)
+library(semPlot)
+library(regsem)
+library("here")
+library(corrplot)# to plot the correlation matrix 
+library(glmnet)
+
+```
+
+
+# Download data 
+```{r}
+sem_plsData <- read.csv("sem_plsData.csv")
+# remove extra column 
+sem_plsData <- sem_plsData |>
+  select(-1)
+
+sem_plsData <- sem_plsData |> 
+  select(-1)
+```
+
+# Adding itmes for outcoems variabels by averaging 
+```{r}
+names(sem_plsData)
+# Group the three outcomes and take their means 
+sem_plsData <- sem_plsData |> 
+  rowwise() |> 
+  mutate(Avg_Transform_Success = mean(c_across(c(IMPL_SUCC_1, EMPL_SAT_9, ORG_IMP_12, STAKEH_ACC_4, EMPL_SKI_8, DEC_IMP_13, BUSI_IMP_11, EMPL_BEL_10))),
+         Avg_Deploy_Success = mean(c_across(c(DEPLOY_6, ACT_INTG_7))),
+         Avg_Improv_Success = mean(c_across(c(BUDG_COMP_2, TASK_COMP_3)))
+         )
+
+# Removes the itmes related to outcomes 
+sem_plsData <- sem_plsData |> 
+  select(-c(IMPL_SUCC_1, BUDG_COMP_2, TASK_COMP_3,  STAKEH_ACC_4, DEPLOY_6, ACT_INTG_7, EMPL_SKI_8, EMPL_SAT_9, EMPL_BEL_10, BUSI_IMP_11, ORG_IMP_12, DEC_IMP_13))
+```
+
+# Check for correlation 
+```{r}
+cor_matrix <- round(cor(sem_plsData, method = "spearman"), 2)
+#write.csv(cor_matrix_DVs, "DVs_correlation_Sperman.csv")
+# Plotting the correlation matrix
+corrplot(cor_matrix, 
+         method = "number", 
+         #order = "hclust", # arranges the variables in a way that those with the highest similarities are closer to each other. 
+         tl.col = "black", 
+         #tl.srt = 45, 
+         addCoef.col = "black",
+         title =  "Correlation",
+         line = -1)
+
+#Note: overall correlation is okay less than 70%
+```
+
+```{r}
+names(sem_plsData)
+Y_Var <- sem_plsData[, c(19: 21)]
+X_Var <- sem_plsData[ ,c(1:18)]
+
+mutliv_lasso <- glmnet( 
+                       as.matrix(X_Var),
+                       as.matrix(Y_Var),
+                       alpha = 1,
+                       family = "mgaussian",
+                       nlambda = 100)
+
+par(mfrow = c(1,3))
+plot(mutliv_lasso, xvar = "lambda")
+
+# Cross validation to determine optimal lambda 
+mutliv_lasso_cv <- cv.glmnet(as.matrix(X_Var),
+                             as.matrix(Y_Var),
+                             family = "mgaussian",
+                             nfolds = 10,
+                             type.measure = "mse")
+# optimla (min) lmbda 
+mutliv_lasso_cv$lambda.min
+mutliv_lasso_cv$lambda.1se
+
+
+# plot 
+#par(mfrow = c(1,3))
+plot(mutliv_lasso_cv)# Finla
+
+# Finla model with optimal lmbda 
+mutliv_lasso_optimla <- glmnet( 
+                       as.matrix(X_Var),
+                       as.matrix(Y_Var),
+                       alpha = 1, # lasso 
+                       family = "mgaussian",
+                       lambda = mutliv_lasso_cv$lambda.min)
+
+coef(mutliv_lasso_optimla)
+
+```
+
+# Transformational Success 
+```{r}
+names(sem_plsData)
+TS_Y <- sem_plsData[, 19]
+
+# Cross validation to determine optimal lambda 
+TS_lasso_cv <- cv.glmnet(as.matrix(X_Var),
+                             as.matrix(TS_Y),
+                             family = "mgaussian",
+                             nfolds = 10,
+                             type.measure = "mse")
+# optimla (min) lmbda 
+TS_lasso_cv$lambda.min
+TS_lasso_cv$lambda.1se
+
+
+# plot 
+#par(mfrow = c(1,3))
+plot(TS_lasso_cv)# Finla
+
+# Finla model with optimal lmbda 
+TS_lasso_optimla <- glmnet( 
+                       as.matrix(X_Var),
+                       as.matrix(TS_Y),
+                       alpha = 1, # lasso 
+                       family = "mgaussian",
+                       lambda = TS_lasso_cv$lambda.min)
+
+coef(TS_lasso_cv)
+```
+
+
