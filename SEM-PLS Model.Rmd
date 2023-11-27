@@ -70,7 +70,7 @@ sem_plsData <- sem_plsData |>
 ```{r}
 set.seed(545)
 meas_model <- constructs(
-  composite("Transformation_Success", multi_items("TS", 1:8), weights = mode_A),
+  composite("Transformation_Success", multi_items("TS", 1:8), weights = mode_A),# mode A for formative construct 
   composite("Deployment_Success", multi_items("DS", 1:2), weights = mode_A),
   composite("Improvement_Project_Success", multi_items("IPS", 1:2), weights = mode_A),
   composite("Improvement_Readiness", multi_items("IR", 1:6), weights = mode_A),
