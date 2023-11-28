@@ -2,14 +2,17 @@
 title: "SEM-PLS"
 author: "Mohammed Alrezq"
 date: "2023-10-16"
-output: html_document
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, warning=FALSE}
 #install.packages("seminr")
 library(seminr)
 library(tidyverse)
@@ -70,7 +73,7 @@ sem_plsData <- sem_plsData |>
 ```{r}
 set.seed(545)
 meas_model <- constructs(
-  composite("Transformation_Success", multi_items("TS", 1:8), weights = mode_A),# mode A for formative construct 
+  composite("Transformation_Success", multi_items("TS", 1:8), weights = mode_A),# mode A for reflective construct 
   composite("Deployment_Success", multi_items("DS", 1:2), weights = mode_A),
   composite("Improvement_Project_Success", multi_items("IPS", 1:2), weights = mode_A),
   composite("Improvement_Readiness", multi_items("IR", 1:6), weights = mode_A),
@@ -112,32 +115,41 @@ model_est_summary$reliability # the rhoA between alpha and rhoC
 plot(model_est_summary$reliability)
 #write.csv(model_est_summary$reliability, "Internal consistency reliability.csv")
 
-# (3) Convergent validity
+#(3) Convergent validity
 model_est_summary$reliability # all AVE above 0.5
 
-# (4) Discriminant validity: the resutls are good
+#(4) Discriminant validity: the results are good
+#(4.1)Fornell and Larcker
 model_est_summary$validity$fl_criteria
-model_est_summary$validity$htmt
 #write.csv(model_est_summary$validity$fl_criteria, "discreminant_validity_FL.csv")
-w#rite.csv(model_est_summary$validity$htmt, "discreminant_validity_HTMT.csv")
 
-#HTMT with boost for discriminant validity 
-boost_summary$bootstrapped_HTMT
+#(4.2)HTMT
+model_est_summary$validity$htmt
+#rite.csv(model_est_summary$validity$htmt, "discreminant_validity_HTMT.csv")
+
+#(4.3)HTMT with boost for discriminant validity (by setting alpha = 0.10 = 90% 2-sided CI)
+boost_summary_HTMT$bootstrapped_HTMT
 #write.csv(boost_summary$bootstrapped_HTMT, "discreminant_validity_HTMTBoost2.csv")
 
-# cross loading for discriminant validity 
+#(4.4)cross loading for discriminant validity 
 model_est_summary$validity$cross_loadings
 #write.csv(model_est_summary$validity$cross_loadings, "discreminant_validity_Cross_Loading.csv")
 ```
 
 # Bootstrap the model 
 ```{r}
+#Bootstrap 
 set.seed(147)
 boost_model <- bootstrap_model(seminr_model = model_est,
                                nboot = 10000,
                                cores = parallel::detectCores(), )
 
-boost_summary <- summary(boost_model, alpha = 0.05)
+#Bootstrap for HTMT Discriminant 
+boost_summary_HTMT <- summary(boost_model, alpha = 0.10)
+
+# Bootstrap for the signifiant coefficient paths 
+boost_summary_paths <- summary(boost_model, alpha = 0.05)
+boost_summary_plot <- summary(boost_model)
 ```
 
 # Structural model results 
@@ -150,7 +162,7 @@ model_est_summary$vif_antecedents # WHY?
 #write.csv(model_est_summary$vif_antecedents, "VIF_score.csv")
 
 #(2) Assess structural relationship (path coefficient) based on bootstrapping model 
-boost_summary$bootstrapped_paths
+boost_summary_paths$bootstrapped_paths
 #write.csv(boost_summary$bootstrapped_paths, "path_coefficient.csv")
 
 #(3) assess model's explanatory power
@@ -184,7 +196,14 @@ plot(predict_summary, indicator = "IPS2")
 # the model has higher predective power by comparing RSEM of PLS out-of-sample metrics with LM out-of-sample metrics
 
 
+# plot bootstrap model 
+plot(boost_summary_plot, title = "Bootstrapped Model")
 
+
+
+
+library(semPlot)
+semPaths(boost_summary_HTMT, whatLabels="est", title="Bootstrapped Model")
 
 ```
 
