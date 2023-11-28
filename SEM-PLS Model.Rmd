@@ -140,16 +140,22 @@ model_est_summary$validity$cross_loadings
 ```{r}
 #Bootstrap 
 set.seed(147)
-boost_model <- bootstrap_model(seminr_model = model_est,
+boost_model_HTMT <- bootstrap_model(seminr_model = model_est,
                                nboot = 10000,
                                cores = parallel::detectCores(), )
 
 #Bootstrap for HTMT Discriminant 
-boost_summary_HTMT <- summary(boost_model, alpha = 0.10)
+boost_summary_HTMT <- summary(boost_model_HTMT, alpha = 0.10)
 
 # Bootstrap for the signifiant coefficient paths 
-boost_summary_paths <- summary(boost_model, alpha = 0.05)
-boost_summary_plot <- summary(boost_model)
+set.seed(1470)
+boost_model_paths <- bootstrap_model(seminr_model = model_est,
+                               nboot = 10000,
+                               cores = parallel::detectCores(), )
+
+
+boost_summary_paths <- summary(boost_model_paths, alpha = 0.05)
+
 ```
 
 # Structural model results 
@@ -197,8 +203,7 @@ plot(predict_summary, indicator = "IPS2")
 
 
 # plot bootstrap model 
-plot(boost_summary_plot, title = "Bootstrapped Model")
-
+plot(boost_model_paths)
 
 
 
