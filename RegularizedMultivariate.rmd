@@ -68,6 +68,22 @@ corrplot(cor_matrix,
          line = -1)
 
 #Note: overall correlation is okay less than 70%
+
+str(sem_plsData)
+sem_plsData$LD_SUP_1 <- as.numeric(sem_plsData$LD_SUP_1)
+sem_plsData$EMP_ATT_3 <- as.numeric(sem_plsData$EMP_ATT_3)
+sem_plsData$RES_AVL_4 <- as.numeric(sem_plsData$RES_AVL_4)
+sem_plsData$LD_INV_5 <- as.numeric(sem_plsData$LD_INV_5)
+sem_plsData$PRJ_SEL_6  <- as.numeric(sem_plsData$PRJ_SEL_6)
+sem_plsData$LD_STL_9   <- as.numeric(sem_plsData$LD_STL_9)
+sem_plsData$DAT_QLT_11  <- as.numeric(sem_plsData$DAT_QLT_11)
+sem_plsData$EMP_ENG_12  <- as.numeric(sem_plsData$EMP_ENG_12)
+sem_plsData$TOOL_AP_13  <- as.numeric(sem_plsData$TOOL_AP_13)
+sem_plsData$CONTX_CUS_14  <- as.numeric(sem_plsData$CONTX_CUS_14)
+sem_plsData$TRA_EDUC_18  <- as.numeric(sem_plsData$TRA_EDUC_18)
+sem_plsData$WKF_SKL_19  <- as.numeric(sem_plsData$WKF_SKL_19)
+sem_plsData$EXP_CON_20  <- as.numeric(sem_plsData$EXP_CON_20)
+
 ```
 
 ```{r}
@@ -95,6 +111,7 @@ mutliv_lasso_cv <- cv.glmnet(as.matrix(X_Var),
 mutliv_lasso_cv$lambda.min
 mutliv_lasso_cv$lambda.1se
 
+coef(mutliv_lasso_cv)
 
 # plot 
 #par(mfrow = c(1,3))
@@ -108,6 +125,7 @@ mutliv_lasso_optimla <- glmnet(
                        family = "mgaussian",
                        lambda = mutliv_lasso_cv$lambda.min)
 
+
 coef(mutliv_lasso_optimla)
 
 ```
@@ -118,6 +136,7 @@ names(sem_plsData)
 TS_Y <- sem_plsData[, 19]
 
 # Cross validation to determine optimal lambda 
+set.seed(123)
 TS_lasso_cv <- cv.glmnet(as.matrix(X_Var),
                              as.matrix(TS_Y),
                              family = "gaussian",# used for single outcome 
@@ -128,9 +147,11 @@ TS_lasso_cv$lambda.min
 TS_lasso_cv$lambda.1se
 
 
+
 # plot 
 #par(mfrow = c(1,3))
 plot(TS_lasso_cv)# Finla
+coef(TS_lasso_cv) # based on the plot, the coef is based on lambda.1se. there are 9 variables and lambda.1se is close to 9 than lambda.min
 
 # Finla model with optimal lmbda 
 TS_lasso_optimla <- glmnet( 
@@ -138,7 +159,7 @@ TS_lasso_optimla <- glmnet(
                        as.matrix(TS_Y),
                        alpha = 1, # lasso 
                        family = "gaussian",
-                       lambda = TS_lasso_cv$lambda.min)
+                       lambda = TS_lasso_cv$lambda.1se)
 
 coef(TS_lasso_optimla)
 
@@ -150,6 +171,7 @@ names(sem_plsData)
 DS_Y <- sem_plsData[, 20]
 
 # Cross validation to determine optimal lambda 
+set.seed(124)
 DS_lasso_cv <- cv.glmnet(as.matrix(X_Var),
                              as.matrix(DS_Y),
                              family = "gaussian",# used for single outcome 
@@ -163,6 +185,7 @@ DS_lasso_cv$lambda.1se
 # plot 
 #par(mfrow = c(1,3))
 plot(DS_lasso_cv)# Finla
+coef(DS_lasso_cv)
 
 # Finla model with optimal lmbda 
 DS_lasso_optimal <- glmnet( 
@@ -174,19 +197,7 @@ DS_lasso_optimal <- glmnet(
 
 coef(DS_lasso_optimal)
 
-plot(DS_lasso_optimal, xvar = "lambda", label = TRUE)
 
-
-# Assuming DS_lasso_optimal and DS_lasso_cv are already defined and computed
-
-# Plot the coefficient paths
-plot(DS_lasso_optimal, xvar = "lambda", label = TRUE)
-
-# Add a vertical line for the optimal lambda
-abline(v=log(DS_lasso_cv$lambda.min), col="red", lwd=2)
-
-# Optionally add a legend
-legend("topright", legend="Optimal Lambda", col="red", lwd=2, cex=0.8)
 
 
 ```
@@ -196,7 +207,8 @@ legend("topright", legend="Optimal Lambda", col="red", lwd=2, cex=0.8)
 names(sem_plsData)
 IPS_Y <- sem_plsData[, 21]
 
-# Cross validation to determine optimal lambda 
+# Cross validation to determine optimal lambda
+set.seed(147)
 IPS_lasso_cv <- cv.glmnet(as.matrix(X_Var),
                              as.matrix(IPS_Y),
                              family = "gaussian",# used for single outcome 
@@ -210,7 +222,7 @@ IPS_lasso_cv$lambda.1se
 # plot 
 #par(mfrow = c(1,3))
 plot(IPS_lasso_cv)# Finla
-
+coef(IPS_lasso_cv)
 # Finla model with optimal lmbda 
 IPS_lasso_optimla <- glmnet( 
                        as.matrix(X_Var),
@@ -226,5 +238,33 @@ coef(IPS_lasso_optimla)
 ```{r}
 https://uc-r.github.io/regularized_regression#other
 
+```
+
+# Apply Regularization using all items (without EFA)
+```{r}
+reg_data <- read.csv("mean_data.csv")
+reg_data <- reg_data |> 
+  select(c(-1, -2))
+
+names(reg_data)
+# Identify DVs by taking the mean of the DVs 
+reg_data <- reg_data |> 
+  rowwise() |> 
+  mutate(General_Success = mean(c_across(c(IMPL_SUCC_1, BUDG_COMP_2, TASK_COMP_3, STAKEH_ACC_4))),
+         Embeddedness = mean(c_across(c(CULT_INTG_5, DEPLOY_6, ACT_INTG_7))),
+         Org_Result = mean(c_across(c(ORG_IMP_12, BUSI_IMP_11, DEC_IMP_13))),
+         Emp_Results = mean(c_across(c(EMPL_BEL_10, EMPL_SAT_9, EMPL_SKI_8))))
+
+# remove items after groping thme  
+reg_data <- reg_data |> 
+  select(c(-1:-13))
+
+summary(reg_data)
+
+```
+
+```{r}
+library(parallel)
+detectCores(logical = FALSE)
 ```
 

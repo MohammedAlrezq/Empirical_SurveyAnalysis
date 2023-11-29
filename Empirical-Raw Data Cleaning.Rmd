@@ -229,6 +229,7 @@ Surv.data <- Surv.data %>%
 Surv.data <- Surv.data %>% 
   filter(!(GOV_LVL %in%
              c("Federal", "Not Governmental")))
+
 ```
 
 ## 3. Initial data analysis 
