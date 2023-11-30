@@ -246,7 +246,6 @@ reg_data <- read.csv("mean_data.csv")
 reg_data <- reg_data |> 
   select(c(-1, -2))
 
-names(reg_data)
 # Identify DVs by taking the mean of the DVs 
 reg_data <- reg_data |> 
   rowwise() |> 
@@ -259,7 +258,6 @@ reg_data <- reg_data |>
 reg_data <- reg_data |> 
   select(c(-1:-13))
 
-summary(reg_data)
 
 ```
 
@@ -268,3 +266,157 @@ library(parallel)
 detectCores(logical = FALSE)
 ```
 
+# General_Success
+```{r}
+names(reg_data)
+
+GS_Y <- reg_data[, 30]
+Var_X <- reg_data[,1:29]
+
+# Cross validation to determine optimal lambda 
+set.seed(1123)
+GS_lasso_cv <- cv.glmnet(as.matrix(Var_X),
+                             as.matrix(GS_Y),
+                             family = "gaussian",# used for single outcome 
+                             nfolds = 10,
+                             type.measure = "mse")
+# optimla (min) lmbda 
+GS_lasso_cv$lambda.min
+GS_lasso_cv$lambda.1se
+
+
+
+# plot 
+#par(mfrow = c(1,3))
+plot(GS_lasso_cv)# Finla
+coef(GS_lasso_cv) # based on the plot, the coef is based on lambda.1se. there are 9 variables and lambda.1se is close to 9 than lambda.min
+
+# Finla model with optimal lmbda 
+GS_lasso_optimla <- glmnet( 
+                       as.matrix(Var_X),
+                       as.matrix(GS_Y),
+                       alpha = 1, # lasso 
+                       family = "gaussian",
+                       lambda = GS_lasso_cv$lambda.1se)
+
+coef(GS_lasso_optimla)
+```
+# Embeddedness
+```{r}
+names(reg_data)
+
+EMBD_Y <- reg_data[, 31]
+Var_X <- reg_data[,1:29]
+
+# Cross validation to determine optimal lambda 
+set.seed(1123)
+EMBD_lasso_cv <- cv.glmnet(as.matrix(Var_X),
+                             as.matrix(EMBD_Y),
+                             family = "gaussian",# used for single outcome 
+                             nfolds = 10,
+                             type.measure = "mse")
+# optimla (min) lmbda 
+EMBD_lasso_cv$lambda.min
+EMBD_lasso_cv$lambda.1se
+
+
+
+# plot 
+#par(mfrow = c(1,3))
+plot(EMBD_lasso_cv)# Finla
+coef(EMBD_lasso_cv) # based on the plot, the coef is based on lambda.1se. there are 9 variables and lambda.1se is close to 9 than lambda.min
+
+# Finla model with optimal lmbda 
+EMBD_lasso_optimla <- glmnet( 
+                       as.matrix(Var_X),
+                       as.matrix(EMBD_Y),
+                       alpha = 1, # lasso 
+                       family = "gaussian",
+                       lambda = GS_lasso_cv$lambda.min)
+
+coef(EMBD_lasso_optimla)
+```
+
+# Organizational Results 
+```{r}
+names(reg_data)
+
+OR_Y <- reg_data[, 32]
+Var_X <- reg_data[,1:29]
+
+# Cross validation to determine optimal lambda 
+set.seed(1123)
+OR_lasso_cv <- cv.glmnet(as.matrix(Var_X),
+                             as.matrix(OR_Y),
+                             family = "gaussian",# used for single outcome 
+                             nfolds = 10,
+                             type.measure = "mse")
+# optimla (min) lmbda 
+OR_lasso_cv$lambda.min
+OR_lasso_cv$lambda.1se
+
+
+
+# plot 
+#par(mfrow = c(1,3))
+plot(OR_lasso_cv)# Finla
+coef(OR_lasso_cv) # based on the plot, the coef is based on lambda.1se. there are 9 variables and lambda.1se is close to 9 than lambda.min
+
+# Finla model with optimal lmbda 
+OR_lasso_optimla <- glmnet( 
+                       as.matrix(Var_X),
+                       as.matrix(OR_Y),
+                       alpha = 1, # lasso 
+                       family = "gaussian",
+                       lambda = GS_lasso_cv$lambda.min)
+
+coef(OR_lasso_optimla)
+```
+
+# Employee Results 
+```{r}
+names(reg_data)
+
+ER_Y <- reg_data[, 33]
+Var_X <- reg_data[,1:29]
+
+# Cross validation to determine optimal lambda 
+set.seed(1123)
+ER_lasso_cv <- cv.glmnet(as.matrix(Var_X),
+                             as.matrix(ER_Y),
+                             family = "gaussian",# used for single outcome 
+                             nfolds = 10,
+                             type.measure = "mse")
+# optimla (min) lmbda 
+ER_lasso_cv$lambda.min
+ER_lasso_cv$lambda.1se
+
+
+
+# plot 
+#par(mfrow = c(1,3))
+plot(ER_lasso_cv)# Finla
+coef(ER_lasso_cv) # based on the plot, the coef is based on lambda.1se. there are 9 variables and lambda.1se is close to 9 than lambda.min
+
+# Finla model with optimal lmbda 
+ER_lasso_optimla <- glmnet( 
+                       as.matrix(Var_X),
+                       as.matrix(ER_Y),
+                       alpha = 1, # lasso 
+                       family = "gaussian",
+                       lambda = GS_lasso_cv$lambda.min)
+
+coef(ER_lasso_optimla)
+
+
+# all plot together 
+par(mfrow = c(2,2))
+plot(GS_lasso_cv, main = "General success")
+plot(EMBD_lasso_cv, main = "Embdedness")
+plot(OR_lasso_cv, main = "Organizationla Results")
+plot(ER_lasso_cv, main = "Employee Results")
+
+
+
+
+```
