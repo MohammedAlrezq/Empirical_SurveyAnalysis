@@ -230,6 +230,8 @@ Surv.data <- Surv.data %>%
   filter(!(GOV_LVL %in%
              c("Federal", "Not Governmental")))
 
+# Download the data for demographic 
+#write.csv(Surv.data, "Demographic_data.csv")
 ```
 
 ## 3. Initial data analysis 

@@ -1,0 +1,116 @@
+---
+title: "Demographic Analysis"
+author: "Mohammed Alrezq"
+date: "2023-12-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+All_Var_data <- read.csv("Demographic_data.csv")
+All_Var_data <- All_Var_data |> 
+  select(-1)
+
+names(All_Var_data)
+```
+
+# Select only Demographic variables 
+```{r}
+demo_data <- All_Var_data |> 
+  select(49:92)
+names(demo_data)
+```
+
+
+```{r}
+# Functional area variable 
+# 1- Social services, 2- Policing force, 3- Transportation, etc
+names(demo_data)
+table(demo_data$FUNC_AREA)
+table(demo_data$Other_Fnction)
+
+
+# to comibed other with the original column Functionla area:
+demo_data <- demo_data|> 
+  mutate(FuncationalArea = if_else(FUNC_AREA == 11, Other_Fnction, as.character(FUNC_AREA))
+)
+
+
+# Suppose the first two columns are A and B, and you want X to be the third column
+demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FUNC_AREA, Other_Fnction, FuncationalArea, everything())
+
+# Remove extra column 
+demo_data <- demo_data |> 
+  select(-3:-4)
+
+```
+
+```{r}
+# institutionalization level of LP/LSS variable 
+# 1- Within a single sub-unit of the organization, 2- Within multiple sub-units of the organization, 3- Across all sub-units of the organization, 4- Other (Please specify)
+names(demo_data)
+table(demo_data$INST_LVL)
+table(demo_data$Other_InstLvl)
+
+
+# to comibed other with the original column Functionla area:
+demo_data <- demo_data|> 
+  mutate(InstitutionalizationLevel = if_else(INST_LVL == 4, Other_InstLvl, as.character(INST_LVL))
+)
+
+
+# Suppose the first two columns are A and B, and you want X to be the third column
+demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FuncationalArea, POP_SIZE, INST_LVL, Other_InstLvl, InstitutionalizationLevel, everything())
+
+# Remove extra column 
+demo_data <- demo_data |> 
+  select(-5:-6)
+
+```
+
+```{r}
+#improvement methodology used 
+#1- Lean Production, 2- Lean Six Sigma, 3- Lean Production with other general improvement methodology, 4- Other (Please specify)
+names(demo_data)
+table(demo_data$IMP_FOCUS)
+table(demo_data$Other_ManFocus)
+
+
+# to comibed other with the original column Functionla area:
+demo_data <- demo_data|> 
+  mutate(ImporvementMethodology = if_else(IMP_FOCUS == 4, Other_ManFocus, as.character(IMP_FOCUS))
+)
+
+
+# Suppose the first two columns are A and B, and you want X to be the third column
+demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FuncationalArea, POP_SIZE, InstitutionalizationLevel, ORG_SIZE, IMP_FOCUS, Other_ManFocus, ImporvementMethodology, everything())
+
+# Remove extra column 
+demo_data <- demo_data |> 
+  select(-7:-8)
+```
+
+```{r}
+#classify your experience 
+#1- Academic/Researcher, 2- Practitioner in an LGO, 3- Consultant, 4- Other (Please specify)
+names(demo_data)
+table(demo_data$EXP)
+table(demo_data$Other_EXP)
+
+
+# to comibed other with the original column Functionla area:
+demo_data <- demo_data|> 
+  mutate(ExperienceRole = if_else(EXP == 4, Other_EXP, as.character(EXP))
+)
+
+
+# Suppose the first two columns are A and B, and you want X to be the third column
+demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FuncationalArea, POP_SIZE, InstitutionalizationLevel, ORG_SIZE, IMP_FOCUS, Other_ManFocus, ImporvementMethodology, everything())
+
+# Remove extra column 
+demo_data <- demo_data |> 
+  select(-7:-8)
+```
