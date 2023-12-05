@@ -107,10 +107,36 @@ demo_data <- demo_data|>
 )
 
 
+# Remove extra column 
+demo_data <- demo_data |> 
+  select(-35:-36)
+```
+
+```{r}
+#Role type  
+#1- Top-level leader/ manager in the organization, 2- Member of the team that guided LP/LSS development and/or implementation, etc
+names(demo_data)
+table(demo_data$ROLE_TYP)
+table(demo_data$Other_Role)
+
+
+# to comibed other with the original column Functionla area:
+demo_data <- demo_data|> 
+  mutate(RoleType = if_else(ROLE_TYP == 6, Other_Role, as.character(ROLE_TYP))
+)
+
+
 # Suppose the first two columns are A and B, and you want X to be the third column
 demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FuncationalArea, POP_SIZE, InstitutionalizationLevel, ORG_SIZE, IMP_FOCUS, Other_ManFocus, ImporvementMethodology, everything())
 
 # Remove extra column 
 demo_data <- demo_data |> 
-  select(-7:-8)
+  select(-38:-39)
 ```
+
+
+```{r}
+#I still need to clean the tools and align the variabels info inside 
+#write.csv(demo_data, "demo_data_afterCleaning.csv")
+```
+
