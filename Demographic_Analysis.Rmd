@@ -10,6 +10,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
+library(tidyverse)
+library(psych)
+```
+
+```{r}
 All_Var_data <- read.csv("Demographic_data.csv")
 All_Var_data <- All_Var_data |> 
   select(-1)
@@ -42,7 +47,7 @@ demo_data <- demo_data|>
 # Suppose the first two columns are A and B, and you want X to be the third column
 demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FUNC_AREA, Other_Fnction, FuncationalArea, everything())
 
-# Remove extra column 
+# Remove extra column FUNC_AREA, and Other_Fnction
 demo_data <- demo_data |> 
   select(-3:-4)
 
@@ -127,16 +132,478 @@ demo_data <- demo_data|>
 
 
 # Suppose the first two columns are A and B, and you want X to be the third column
-demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FuncationalArea, POP_SIZE, InstitutionalizationLevel, ORG_SIZE, IMP_FOCUS, Other_ManFocus, ImporvementMethodology, everything())
+demo_data <- demo_data %>% select(ORG_CTRY, GOV_LVL, FuncationalArea, POP_SIZE, InstitutionalizationLevel, ORG_SIZE, ImporvementMethodology, everything())
 
 # Remove extra column 
 demo_data <- demo_data |> 
-  select(-38:-39)
+  select(-36:-37)
 ```
 
 
 ```{r}
-#I still need to clean the tools and align the variabels info inside 
+#I still need to clean the tools and align the variables info inside 
 #write.csv(demo_data, "demo_data_afterCleaning.csv")
+```
+
+
+# Taking all data to align with data for statistical model 
+```{r}
+#Total NAs per participant for dependent and independent variables/items   
+names(demo_data)
+# select aqll except tools 
+demo_data_Non_tools <- demo_data |> 
+  select(c(1:7, 34:39))
+
+demo_data_Non_tools <- demo_data_Non_tools %>% 
+  mutate(total_na1 = rowSums(is.na(demo_data_Non_tools)))
+
+NAs_per_part1 <- ggplot(demo_data_Non_tools, aes(total_na1)) +
+  geom_bar(fill = "maroon") + # to fill bar color 
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.8) +
+  scale_x_continuous(breaks = seq(min(demo_data_Non_tools$total_na1, na.rm = TRUE), 
+                                  max(demo_data_Non_tools$total_na1, na.rm = TRUE), 
+                                  by = 2)) +
+  labs(x = "Total Missing Responses", 
+       y = "Participant", 
+       title = "Missing Responses per Participant") +
+  ylim(0, 100) 
+NAs_per_part1
+
+# filter data by selecting those with less than 11 missing 
+demo_data_Non_tools <- demo_data_Non_tools %>% 
+  filter(total_na1 <= 5)
+
+# remove defense: one of the funcationla area 
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  filter(!FuncationalArea %in%
+                            "Defense")
+```
+
+# Align names in each variabel 
+```{r}
+#names(demo_data_Non_tools)
+table(demo_data_Non_tools$FuncationalArea)
+
+# Reassign numeric to text 
+demo_data_Non_tools<- demo_data_Non_tools |> 
+  mutate(FuncationalArea = case_when(
+    FuncationalArea == "1" ~ "Social Services",
+    FuncationalArea == "10" ~ "Healthcare",
+    FuncationalArea == "3"~ "Transportation",
+    FuncationalArea == "4" ~ "Finance and taxation",
+    FuncationalArea == "5" ~ "School and education",
+    FuncationalArea == "7" ~ "Court", 
+    FuncationalArea == "9" ~ "Administration services", 
+    TRUE ~ FuncationalArea  # Keeps the original FuncationalArea if none of the above conditions are met
+  ))
+
+# Clean and organizations Funcationla area
+demo_data_Non_tools <- demo_data_Non_tools %>%
+  mutate(FuncationalArea = case_when(
+    FuncationalArea %in% c("Industrial Insurance / Labor Standards / Safety & Health", "All agencies in the organization", "All State Services", "Water/Sewer, Legal, Building &Housing, Finance") ~ "All/Multiple Funcational Area",
+    FuncationalArea %in% c("Environmental Management", "Environmental Protection", "Environmental") ~ "Environmental Protection",
+    FuncationalArea %in% c("Public Health") ~ "Healthcare",
+    TRUE ~ FuncationalArea  # Keeps the original FuncationalArea if none of the above conditions are met
+  ))
+```
+
+
+# Institutionalization Level
+```{r}
+table(demo_data_Non_tools$InstitutionalizationLevel)
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(InstitutionalizationLevel = case_when(
+    InstitutionalizationLevel == "1" ~ "Within a single sub-unit of the organization",
+    InstitutionalizationLevel == "2" ~ "Within multiple sub-units of the organization",
+    InstitutionalizationLevel == "3" ~ "Across all sub-units of the organization",
+    TRUE ~ InstitutionalizationLevel
+  ))
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(InstitutionalizationLevel = case_when(
+    InstitutionalizationLevel %in% c("Multiple departments within and Agency of the County") ~ "Within multiple sub-units of the organization",
+    TRUE ~ InstitutionalizationLevel  # Keeps the original InstitutionalizationLevel if none of the above conditions are met
+  ))
+```
+
+# ORG_SIZE
+```{r}
+table(demo_data_Non_tools$ORG_SIZE)
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(ORG_SIZE = case_when(
+    ORG_SIZE == "1" ~ "Less than 100 employees",
+    ORG_SIZE == "2" ~ "Between 101 to 250 employees",
+    ORG_SIZE == "3" ~ "Between 251 to 500 employees",
+    ORG_SIZE == "4" ~ "Between 501 to 750 employees",
+    ORG_SIZE == "5" ~ "Between 751 to 1,000 employees",
+    ORG_SIZE == "6" ~ "More than 1,000 employees",
+    TRUE ~ InstitutionalizationLevel
+  ))
+```
+
+# Improvement Methodology 
+```{r}
+table(demo_data_Non_tools$ImporvementMethodology)
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(ImporvementMethodology = case_when(
+    ImporvementMethodology == "1" ~ "Lean Production", 
+    ImporvementMethodology == "2" ~"Lean Six Sigma",
+    ImporvementMethodology == "3" ~ "Lean Production with other general improvement
+methodology",
+
+TRUE ~ImporvementMethodology
+  ))
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(ImporvementMethodology = case_when(
+    ImporvementMethodology %in% c("DMAIC") ~ "Six Sigma",
+    ImporvementMethodology %in% c("Lean Services")~ "Lean Production", 
+    
+    TRUE ~ ImporvementMethodology
+  ))
+
+```
+
+# Percentaqe Implemented 
+```{r}
+table(demo_data_Non_tools$IMPL_PCT)
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(
+    IMPL_PCT = as.character(IMPL_PCT),# Convert IMPL_PCT to character as it did not run without it 
+    IMPL_PCT = case_when(
+    IMPL_PCT == "1" ~ "0-20%", 
+    IMPL_PCT == "2" ~"21%-40%",
+    IMPL_PCT == "3" ~"41%-60%",
+    IMPL_PCT == "4" ~"61%-80%",
+    IMPL_PCT == "5" ~ "81%-100%",
+
+TRUE ~IMPL_PCT
+  ))
+```
+
+#years of experience 
+```{r}
+table(demo_data_Non_tools$EXP_YRS)
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(
+    EXP_YRS = as.character(EXP_YRS),# Convert IMPL_PCT to character as it did not run without it 
+    EXP_YRS = case_when(
+    EXP_YRS == "1" ~ "Less than a year", 
+    EXP_YRS == "2" ~"1-5 years",
+    EXP_YRS == "3" ~"6-10 years",
+    EXP_YRS == "4" ~"11-15 years",
+    EXP_YRS == "5" ~ "16-20 years",
+    EXP_YRS == "6" ~ "More than 20 years",
+
+TRUE ~EXP_YRS
+  ))
+```
+
+# How long ago was this LP/LSS completed
+```{r}
+table(demo_data_Non_tools$COMP_AGO)
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(
+    COMP_AGO = as.character(COMP_AGO),# Convert IMPL_PCT to character as it did not run without it 
+    COMP_AGO = case_when(
+    COMP_AGO == "1" ~ "Less than 6 months ago", 
+    COMP_AGO == "2" ~"Between 6 and 12 months ago",
+    COMP_AGO == "3" ~"Between 12 and 18 months ago",
+    COMP_AGO == "4" ~"Between 12 and 18 months ago",
+    COMP_AGO == "5" ~ "More than 24 months ago",
+
+TRUE ~COMP_AGO
+  ))
+```
+
+#How long has the organization been working on LP/LSS
+```{r}
+table(demo_data_Non_tools$ORG_EXP)
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(
+    ORG_EXP = as.character(ORG_EXP),# Convert IMPL_PCT to character as it did not run without it 
+    ORG_EXP = case_when(
+    ORG_EXP == "1" ~ "Less than 1 year", 
+    ORG_EXP == "2" ~"Between 1 and 2 years",
+    ORG_EXP == "3" ~"Between 3 and 4 years",
+    ORG_EXP == "4" ~"Between 5 and 6 years",
+    ORG_EXP == "5" ~ "More than 6 years",
+
+TRUE ~ORG_EXP
+  ))
+```
+
+# How would you classify your experience with LP/LSS?
+```{r}
+table(demo_data_Non_tools$ExperienceRole)
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(
+    ExperienceRole = as.character(ExperienceRole),# Convert IMPL_PCT to character as it did not run without it 
+    ExperienceRole = case_when(
+    ExperienceRole == "1" ~ "Academic/Researcher", 
+    ExperienceRole == "2" ~"Practitioner in an LGO",
+    ExperienceRole == "3" ~"Consultant",
+
+TRUE ~ExperienceRole
+  ))
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(ExperienceRole = case_when(
+    ExperienceRole %in% c("Internal Consultant", "Manager of a Lean Office") ~ "Practitioner in an LGO",
+    
+    TRUE ~ExperienceRole
+  ))
+
+
+
+```
+
+
+# best describes your role (or roles) in LP/LSS development
+```{r}
+table(demo_data_Non_tools$RoleType)
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(
+    RoleType = as.character(RoleType),# Convert IMPL_PCT to character as it did not run without it 
+    RoleType = case_when(
+    RoleType == "1" ~ "Top-level leader/ manager in the organization", 
+    RoleType == "2" ~"Member of the team that guided LP/LSS development and/or implementation",
+    RoleType == "3" ~"Consultant within the department or from other departments/units within the organization",
+    RoleType == "4" ~"External consultant",
+    RoleType == "5" ~"Process owner",
+    
+TRUE ~RoleType
+  ))
+
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  mutate(RoleType = case_when(
+    RoleType %in% c("Lean Facilitator within the unit", "Implement LP/LSS in directly assigned work task and life") ~ "Consultant within the department or from other departments/units within the organization",
+    RoleType %in% c("Organizational Learning & Development") ~ "Top-level leader/ manager in the organization",
+    
+    TRUE ~RoleType
+  ))
+
+```
+
+# To Print data: descriptive summary fo all demographic varibales except POP-SIZE 
+```{r}
+demo_data_Non_tools <- demo_data_Non_tools |> 
+  select(c(-14:-22))
+
+names(demo_data_Non_tools)
+library(crosstable)
+# All observation 
+demo_data_Non_tools_summary <- crosstable(demo_data_Non_tools)
+demo_data_Non_tools_summary
+write.csv(demo_data_Non_tools_summary, "descriptive_demographic_WO_POP_SIZE.csv")
+```
+
+
+# Population size 
+```{r}
+#write.csv(demo_data_Non_tools, "demographic_Data.csv")
+# Note: here i donwload the data after clean all variables and ajust Pop-SIZE mannually and then reupload the data 
+
+New_demo_data_Non_tools <- read.csv("demographic_Data.csv")
+New_demo_data_Non_tools <- New_demo_data_Non_tools |> 
+  select(-1)
+names(New_demo_data_Non_tools)
+
+# Convert cells with not defined NAs to NAs 
+New_demo_data_Non_tools[New_demo_data_Non_tools == 'NA'] <- NA
+# convet empty cells to NAs
+New_demo_data_Non_tools[New_demo_data_Non_tools == ''] <- NA
+# To remove comma from the observations 
+New_demo_data_Non_tools$POP_SIZE <- gsub(",", "", New_demo_data_Non_tools$POP_SIZE)
+
+New_demo_data_Non_tools$POP_SIZE <- as.numeric(New_demo_data_Non_tools$POP_SIZE)
+
+
+New_demo_data_Non_tools <- New_demo_data_Non_tools |> 
+  mutate(POP_SIZE_New = case_when(
+    POP_SIZE <= 100000 ~ "<=100K",
+    POP_SIZE >100000 & POP_SIZE <= 500000 ~ "100K-500K",
+    POP_SIZE > 500000 & POP_SIZE <= 1000000 ~ "500K-1M",
+    POP_SIZE>1000000 ~ ">1M"
+  ))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+
+
+
+# Tools
+```{r}
+names(demo_data)
+
+Tools_LPLss <- demo_data |> 
+  select(8:33)
+
+Tools_LPLss <- Tools_LPLss %>% 
+  mutate(total_na1 = rowSums(is.na(Tools_LPLss)))
+
+NAs_per_part1 <- ggplot(Tools_LPLss, aes(total_na1)) +
+  geom_bar(fill = "maroon") + # to fill bar color 
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.8) +
+  scale_x_continuous(breaks = seq(min(Tools_LPLss$total_na1, na.rm = TRUE), 
+                                  max(Tools_LPLss$total_na1, na.rm = TRUE), 
+                                  by = 2)) +
+  labs(x = "Total Missing Responses", 
+       y = "Participant", 
+       title = "Missing Responses per Participant") +
+  ylim(0, 100) 
+NAs_per_part1
+
+Tools_LPLss <- Tools_LPLss %>% 
+  filter(total_na1 <= 24)
+
+sum(table(Tools_LPLss$VSM))
+
+table(Tools_LPLss$Other_Tools)
+
+# Change texts in column other_tools to other
+
+Tools_LPLss <- Tools_LPLss %>%
+  mutate(Other_Tools = case_when(
+    Other_Tools %in% c("Kaizen every day, stand-up meetings") ~ "1",
+    Other_Tools %in% c("Customer Journey Mapping; Usability Studies") ~ "1",
+    Other_Tools %in% c("PICK Chart") ~ "1",
+    Other_Tools %in% c("Process Instructions Development") ~ "1",
+    Other_Tools %in% c("process walks, data collection plan, implementation plan, etc.") ~ "1",
+    Other_Tools %in% c("SIPOC") ~ "1",
+    Other_Tools %in% c("statistical analysis") ~ "1",
+    Other_Tools %in% c("Obeya") ~ "1",
+    
+    TRUE ~ Other_Tools  # Keeps the original FuncationalArea if none of the above conditions are met
+  ))
+
+Tools_LPLss <- Tools_LPLss |> 
+  select(-27)
+
+```
+
+# Remove duplicte columns 
+```{r}
+# remove duplicate column: Project_Charter_2
+sum(!is.na(Tools_LPLss$Project_Charter))
+sum(!is.na(Tools_LPLss$Project_Charter_2))
+names(Tools_LPLss)
+
+# Assuming you have a dataframe named df with columns Project_Charter and Project_Charter_2
+
+# Combine the two columns as described
+Tools_LPLss$Project_Charter <- ifelse(is.na(Tools_LPLss$Project_Charter) & Tools_LPLss$Project_Charter_2 == 1, 
+                             1, 
+                             Tools_LPLss$Project_Charter)
+
+# This will leave Project_Charter as is if it's 1, 
+# but replace NA with 1 if Project_Charter_2 is 1.
+
+
+# # remove duplicate column: Benchmarking_2
+sum(!is.na(Tools_LPLss$Benchmarking_2))
+sum(!is.na(Tools_LPLss$Benchmarking))
+
+#bench <- Tools_LPLss |> 
+  select(11, 19)
+
+Tools_LPLss$Benchmarking <- ifelse(is.na(Tools_LPLss$Benchmarking) & Tools_LPLss$Benchmarking_2 == 1, 
+                             1, 
+                             Tools_LPLss$Benchmarking)
+Tools_LPLss <- Tools_LPLss |> 
+  select(c(-18:-19))
+```
+
+# Plot tools 
+```{r}
+names(Tools_LPLss)
+Tools_LPLss<- Tools_LPLss |> 
+  rename(
+    VSM = VSM,
+    "5S" = FIVE_S,
+    "Visual Management" = Visual_Mgmt,
+    "5Whys"= Five_Whys,
+    "Process Flow Chart" = PFC,
+    "Kaizen Events" = KEs,
+    "Cause and Effect Diagram/Analysis" = CEDA,
+    "Mistake Proofing" = Mistake_Proofing, 
+    "Project Charter" = Project_Charter,
+    "Gemba" = Gemba, 
+    Benchmarking = Benchmarking,
+    "Spaghetti Diagram" = Spaghetti_Diagram,
+    "Statistical Process Control" = SPC, 
+    "Check Sheet Kanban"= CS_Kanban, 
+    "Critical to Quality" = CTQ,
+    "One-Piece Flow" = OPF,
+    "Quality Function Deployment"= QFD,
+    "Cycle Time Analysis" = CTA,
+    "Policy Deployment"= PD,
+    A3 = A3,
+    Brainstorming = Brainstorming.,
+    "Lead Time Analysis"= LTA,
+    "Single-Minute Exchange of Dies" =SMED, 
+    Other_Tools = Other_Tools
+    
+    
+  )
+
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+
+# Assume Tools_LPLss is your dataframe
+# Replace empty strings with NA in the Other_Tools column
+Tools_LPLss$Other_Tools[Tools_LPLss$Other_Tools == ""] <- NA
+
+# Convert all 'NA' strings to actual NA values
+Tools_LPLss[Tools_LPLss == 'NA'] <- NA
+
+# Reshape the data from wide to long format
+long_data <- pivot_longer(Tools_LPLss, cols = everything(), names_to = "Variable", values_to = "Value")
+
+# Count the number of non-NA values for each variable and sort it
+long_data_sorted <- long_data %>%
+  filter(!is.na(Value)) %>% # Filter out NA values
+  group_by(Variable) %>%
+  summarise(Count = n()) %>%
+  ungroup() %>%
+  arrange(desc(Count)) %>%
+  mutate(Variable = factor(Variable, levels = Variable))
+
+
+
+
+# Now use ggplot2 to create the plot with sorted bars
+ggplot(long_data_sorted, aes(x = Variable, y = Count, fill = Variable)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "LP/LSS Tools", x = "Tools", y = "Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 ```
 
