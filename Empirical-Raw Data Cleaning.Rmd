@@ -310,6 +310,23 @@ CompletedCases.plot <- gg_miss_var(data.CompletedCases, show_pct = TRUE) +
 ggsave(filename = here("plot_folder", "CompletedCases.plot.png"), plot = CompletedCases.plot)
 ```
 
+# To check on strighlining by calculating standard deviation per participants of 67 people 
+```{r}
+strihglining <- data.CompletedCases |> 
+  select(-1) |> 
+  rowwise() |> 
+  mutate(
+    mean = mean(c_across(everything()), na.rm = TRUE),
+    sd = sd(c_across(everything()), na.rm = TRUE)
+  )
+
+max(strihglining$sd)
+min(strihglining$sd)
+
+sort(strihglining$sd)
+```
+
+
 ## 4 Data Imputation 
 - This imputation section is divided into two subsections: imputation with subset of the data **(67 participants with 7.5% missing)** and imputation with the full dataset **(75 participants with 17% missing)**
 
