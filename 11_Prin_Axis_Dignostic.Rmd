@@ -100,6 +100,11 @@ model_11_sum.stat
 dev.off()
 #psych::describe(model_11, fast = TRUE)
 #
+
+install.packages("summarytools")
+library(summarytools)
+view(dfSummary(model_11))
+
 ```
 
 ## 2 Principle Axis factoring
