@@ -101,6 +101,7 @@ set.seed(123)
 model_est <- estimate_pls(sem_plsData, measurement_model = meas_model, structural_model = struc_model,inner_weights = path_weighting)
 
 model_est_summary <- summary(model_est)
+str(model_est)
 
 # max iteration: should be less than 300 max no. of iteration
 model_est_summary$iterations # iteration =6 which is good 
@@ -108,7 +109,7 @@ model_est_summary$iterations # iteration =6 which is good
 #(1) indicator's reliability and 
 model_est_summary$loadings
 model_est_summary$loadings^2
-#write.csv(model_est_summary$loadings^2, "SEM-PLS_indicator_reliability_squared.csv")
+#write.csv(model_est_summary$loadings, "SEM-PLS_indicator_reliability_squared.csv")
 
 #(2) Internal consistency reliability
 model_est_summary$reliability # the rhoA between alpha and rhoC
@@ -134,6 +135,10 @@ boost_summary_HTMT$bootstrapped_HTMT
 #(4.4)cross loading for discriminant validity 
 model_est_summary$validity$cross_loadings
 #write.csv(model_est_summary$validity$cross_loadings, "discreminant_validity_Cross_Loading.csv")
+#
+model_est_summary$fSquare
+
+plot(model_est)
 ```
 
 # Bootstrap the model 
@@ -153,23 +158,24 @@ boost_model_paths <- bootstrap_model(seminr_model = model_est,
                                nboot = 10000,
                                cores = parallel::detectCores(), )
 
-
+set.seed(001)
 boost_summary_paths <- summary(boost_model_paths, alpha = 0.05)
 
+plot(boost_model_paths)
 ```
 
 # Structural model results 
 ```{r}
-#(1) VIF from the estimated model NOT the boost model 
+#(1) VIF from the estimated model NOT the boost model: this is VIF for items
 model_est_summary$validity$vif_items
 #write.csv(model_est_summary$validity$vif_items, "items_VIF.csv")
 
-model_est_summary$vif_antecedents # WHY?
+model_est_summary$vif_antecedents # WHY?this is VIF for constructs
 #write.csv(model_est_summary$vif_antecedents, "VIF_score.csv")
 
 #(2) Assess structural relationship (path coefficient) based on bootstrapping model 
 boost_summary_paths$bootstrapped_paths
-#write.csv(boost_summary$bootstrapped_paths, "path_coefficient.csv")
+#write.csv(boost_summary_paths$bootstrapped_paths, "path_coefficient.csv")
 
 #(3) assess model's explanatory power
 model_est_summary$paths
@@ -184,8 +190,9 @@ predict_model <- predict_pls(
 )
 predict_summary <- summary(predict_model)
 
+
 # analysis of the distribtuion to select RMSE or MEA
-par(mfrow=c(3,4)) 
+par(mfrow=c(4,4)) 
 plot(predict_summary, indicator = "TS1")
 plot(predict_summary, indicator = "TS2")
 plot(predict_summary, indicator = "TS3")
@@ -201,9 +208,12 @@ plot(predict_summary, indicator = "IPS2")
 
 # the model has higher predective power by comparing RSEM of PLS out-of-sample metrics with LM out-of-sample metrics
 
+#(5) Effect size 
+model_est_summary$fSquare
+#write.csv(model_est_summary$fSquare, "effect_size.csv")
 
-# plot bootstrap model 
-plot(boost_model_paths)
+#(total effect)
+boost_summary_paths$bootstrapped_total_paths
 
 
 

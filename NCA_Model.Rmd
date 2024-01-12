@@ -1,0 +1,75 @@
+---
+title: "NCA_model"
+author: "Mohammed Alrezq"
+date: "2024-01-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Download package for NCA
+```{r}
+# Ncessary condition analysis 
+#Installation, update and loading of the NCA package 
+install.packages("NCA", dependencies = TRUE )
+library(NCA) 
+```
+
+```{r}
+# Necessary condition analysis 
+
+#model_est_summary$composite_scores
+#write.csv(model_est_summary$composite_scores, "NCA_composite_score.csv")
+
+#Read own data set “TIAM_FR” (exported LVS from PLS-SEM) 
+comp_score_data <- read.csv("NCA_composite_score.csv") 
+comp_score_data <- comp_score_data |> 
+  select(-1)
+
+names(comp_score_data)
+
+# VD1: Example of an advanced NCA analysis with Transformation success
+model_ts <- nca_analysis(comp_score_data, c(4:8), 1, test.rep = 10000)
+model_ts
+
+nca_output(model_ts, 
+           plots = TRUE, 
+           summaries = TRUE, 
+           bottlenecks = TRUE)
+
+
+#identifying potential outliers
+# nca_outliers(comp_score_data, 1,1, plotly = T) #Improvement_Readiness
+# nca_outliers(comp_score_data, 2,1, plotly = T) #Sustainable_Improvement_Infrastructure
+# nca_outliers(comp_score_data, 3,1, plotly = T) #Sustainable_Improvement_Infrastructure
+
+
+
+
+
+# DV2: Example of an advanced NCA analysis with Deployment Success
+model_ds <- nca_analysis(comp_score_data, c(4:8), 2, test.rep = 10000)
+model_ds
+
+nca_output(model_ds, 
+           plots = TRUE, 
+           summaries = TRUE, 
+           bottlenecks = TRUE)
+
+
+
+
+# DV3: Example of an advanced NCA analysis with Improvement_Project_Success
+model_ips <- nca_analysis(comp_score_data, c(4:8), 3, test.rep = 10000)
+model_ips
+
+nca_output(model_ips, 
+           plots = TRUE, 
+           summaries = TRUE, 
+           bottlenecks = TRUE)
+```
+
+```
+

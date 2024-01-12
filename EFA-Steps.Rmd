@@ -1,0 +1,106 @@
+---
+title: "EFA steps-"
+author: "Mohammed Alrezq"
+date: "2023-12-27"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# 1. Preliminary 
+### 1.1 Load libraires: this need to be 
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(psych)# use perform EFA
+library(purrr)
+library(ggplot2)
+library(gridExtra)# to arrnge plot per row and col
+library(corrr)
+```
+
+
+```{r,}
+plotTheme <- function() {
+  theme(
+    plot.title = element_text(size = 14, family = "sans", face = "plain", hjust = 0),
+    plot.subtitle=element_text(size = 11, family = "sans", hjust = 0),
+    plot.caption=element_text(size = 10, family = "sans", face = "italic", hjust = 0), 
+    axis.title.x = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = -0.5),
+    axis.title.y = element_text(size = 10, family = "sans", face = "plain", hjust = 1, vjust = 1),
+    axis.text = element_text(size = 9, family = "sans", face = "plain"),
+    panel.background = element_blank(),
+    panel.grid.minor = element_line(colour = "gray"),
+    panel.grid.major = element_line(colour = "gray"),
+    axis.ticks = element_blank(),
+    legend.title = element_text(size = 10, family = "sans"),
+    legend.text = element_text(size = 9, family = "sans"),
+    axis.line = element_blank()
+  )
+}
+```
+
+## 1.2 load data
+```{r}
+model_11 <- read.csv("mean_data.csv")
+
+# Remove Response.ID and col X from the data 
+model_11 <- model_11 |> 
+  select(c(-Response.ID, -X))
+
+# Convert all integer columns to numeric
+model_11 <- model_11 |> 
+  mutate_if(is.integer, as.numeric)
+```
+
+## 1.3 Split data to dependent and independet variables 
+```{r}
+# Dependent variables/items 
+model_11_DVs <- model_11 |> 
+  select(1:13)
+#str(model_11_DVs)
+# Independent variables/items 
+model_11_IVs <- model_11 |> 
+  select(14:42)
+#str(model_11_IVs)
+```
+
+
+
+
+```{r}
+set.seed(232333)
+model_11_IV_F5 <- psych::fa(model_11_IVs,nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5, cut = 0.29, sort=TRUE)
+
+
+#2
+set.seed(2323330)
+model_11_IV_F5_5items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("INSTIT_17", "SCOPE_16", "GOAL_AL_27", "EXT_CON_21", "RES_CHG_8")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5_5items, sort=TRUE)
+
+#3
+set.seed(23233300)
+model_11_IV_F5_7items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("INSTIT_17", "SCOPE_16", "GOAL_AL_27", "EXT_CON_21", "RES_CHG_8", "TEAM_ST_29", "SYS_COM_28")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5_7items, sort=TRUE)
+
+
+
+
+
+#4
+set.seed(232333000)
+model_11_IV_F5_8items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("INSTIT_17", "SCOPE_16", "GOAL_AL_27", "EXT_CON_21", "RES_CHG_8", "TEAM_ST_29", "SYS_COM_28", "COM_KNW_23")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5_8items, sort=TRUE)
+
+
+#5
+set.seed(232333022)
+model_11_IV_F5_11items <- psych::fa(model_11_IVs[, !names(model_11_IVs) %in% c("INSTIT_17", "SCOPE_16", "GOAL_AL_27", "EXT_CON_21", "RES_CHG_8", "TEAM_ST_29", "SYS_COM_28", "COM_KNW_23", "ORG_CUL_2", "ORG_CHR_10", "GOAL_CL_25")],nfactors = 5, fm = "pa", rotate = "promax", max.iter = 100)
+psych::print.psych(model_11_IV_F5_11items, sort=TRUE)
+```
+
