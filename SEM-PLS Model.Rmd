@@ -101,7 +101,7 @@ set.seed(123)
 model_est <- estimate_pls(sem_plsData, measurement_model = meas_model, structural_model = struc_model,inner_weights = path_weighting)
 
 model_est_summary <- summary(model_est)
-str(model_est)
+#str(model_est)
 
 # max iteration: should be less than 300 max no. of iteration
 model_est_summary$iterations # iteration =6 which is good 
