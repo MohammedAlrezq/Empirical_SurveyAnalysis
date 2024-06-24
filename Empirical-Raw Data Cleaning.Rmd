@@ -177,7 +177,7 @@ Surv.data <- Surv.data %>%
 
 ```
 
-### 2.3 Organizing  
+### 2.3 Organizing
 ```{r}
 library(lubridate)
 # to change Timestamp..mm.dd.yyyy. to date/time column and remove Timestamp..mm.dd.yyyy. and time. Keep only date  
