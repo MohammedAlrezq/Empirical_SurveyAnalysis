@@ -50,7 +50,7 @@ Surv.data <- read.csv("SurveyReport-10640347-07-12-2023-T114540.034.csv")
 ```
 
 ## 2. Data Wangling 
-### 2.1 Remove unnecessary columns from the raw dataset/survey
+### 2.1 Remove unnecessary columns from the raw dataset/survey or survey
 
 ```{r}
 Surv.data <-  Surv.data %>% 
