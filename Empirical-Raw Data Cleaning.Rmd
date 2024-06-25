@@ -43,7 +43,7 @@ plotTheme <- function() {
 
 ```
 
-### 1.3 Upload the data 
+### 1.3 Upload the data-
 ```{r}
 Surv.data <- read.csv("SurveyReport-10640347-07-12-2023-T114540.034.csv")
 
